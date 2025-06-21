@@ -1,4 +1,5 @@
 import { MainSidebar } from "@/components/main-sidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 export default function DashboardLayout({
   children,
@@ -6,11 +7,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen">
+    <SidebarProvider>
       <MainSidebar />
-      <main className="flex-1 overflow-auto bg-background p-4 sm:p-6 md:p-8">
+      <SidebarInset className="overflow-auto p-4 sm:p-6 md:p-8">
         {children}
-      </main>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
