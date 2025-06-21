@@ -152,34 +152,36 @@ const getRandomCard = (cardsByRarity: { [key in Rarity]?: PokemonCard[] }, rarit
   return rarityPool[Math.floor(Math.random() * rarityPool.length)];
 };
 
-export const getBoosterPack = async (setId: string, size: number = 10): Promise<PokemonCard[]> => {
+export const getBoosterPack = async (setId: string, size: number = 5): Promise<PokemonCard[]> => {
   const setData = await initializeCardData(setId);
 
   if (!setData || setData.allCards.length === 0) return [];
 
   const pack: PokemonCard[] = [];
   
-  for (let i = 0; i < 6; i++) {
-    const card = getRandomCard(setData.cardsByRarity, 'Common');
-    if (card) pack.push(card);
-  }
-
+  // 3 Common cards
   for (let i = 0; i < 3; i++) {
-    const card = getRandomCard(setData.cardsByRarity, 'Uncommon');
-    if (card) pack.push(card);
-  }
-
-  const isUltraRare = Math.random() < 0.125; // 12.5% chance
-  const rareCard = getRandomCard(setData.cardsByRarity, isUltraRare ? 'Ultra Rare' : 'Rare');
-  if (rareCard) {
-    pack.push(rareCard);
-  }
-
-  while (pack.length < size && setData.allCards.length > 0) {
     const card = getRandomCard(setData.cardsByRarity, 'Common');
     if (card) pack.push(card);
   }
 
+  // 1 Uncommon card
+  const uncommonCard = getRandomCard(setData.cardsByRarity, 'Uncommon');
+  if (uncommonCard) pack.push(uncommonCard);
+
+  // 1 Rare or Ultra Rare card
+  const isUltraRare = Math.random() < 0.20; // 20% chance for an Ultra Rare in the rare slot
+  const rareSlotCard = getRandomCard(setData.cardsByRarity, isUltraRare ? 'Ultra Rare' : 'Rare');
+  if (rareSlotCard) {
+    pack.push(rareSlotCard);
+  }
+
+  // Ensure pack has 5 cards, backfilling with commons if any slot failed
+  while (pack.length < size && setData.cardsByRarity['Common'] && setData.cardsByRarity['Common'].length > 0) {
+    const card = getRandomCard(setData.cardsByRarity, 'Common');
+    if (card) pack.push(card);
+  }
+  
   return pack.slice(0, size);
 };
 

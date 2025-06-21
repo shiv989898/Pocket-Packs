@@ -14,7 +14,7 @@ const packsForSale = [
   {
     id: 'booster_pack_1',
     name: 'Booster Pack',
-    description: 'A pack that can be opened for any available set. Contains 10 cards.',
+    description: 'A pack containing 5 cards. Can be opened for any available set.',
     cost: 100,
     amount: 1,
     imageUrl: swordAndShieldEraSets[0].packImageUrl,
@@ -23,18 +23,18 @@ const packsForSale = [
   {
     id: 'collectors_bundle_5',
     name: "Collector's Bundle",
-    description: 'A bundle of 5 booster packs.',
+    description: 'A bundle of 5 booster packs at a discount.',
     cost: 450,
     amount: 5,
     imageUrl: swordAndShieldEraSets[2].packImageUrl,
     aiHint: 'pokemon booster bundle'
   },
   {
-    id: 'treasure_chest_12',
+    id: 'treasure_chest_10',
     name: 'Treasure Chest',
-    description: 'A massive chest of 12 booster packs.',
-    cost: 1000,
-    amount: 12,
+    description: 'A massive chest of 10 booster packs.',
+    cost: 900,
+    amount: 10,
     imageUrl: swordAndShieldEraSets[4].packImageUrl,
     aiHint: 'pokemon treasure chest'
   },
