@@ -47,10 +47,11 @@ export function PackOpener() {
         setIsOpening(false);
         if (newCards && newCards.length > 0) {
           setPackContents(newCards);
+          setRevealedIndex(0); // Directly show the first card
           setIsRevealing(true);
           toast({
             title: "Pack Ready!",
-            description: `Reveal your ${newCards.length} new cards!`,
+            description: `You've got ${newCards.length} new cards!`,
           });
         } else {
            toast({
@@ -149,7 +150,7 @@ export function PackOpener() {
             {revealedIndex < packContents.length - 1 ? <ChevronRight className="ml-2"/> : <Check className="ml-2"/>}
         </Button>
         <div className="text-muted-foreground mt-4 text-sm">
-             {revealedIndex < packContents.length ? `Card ${revealedIndex + 1} of ${packContents.length}`: 'Pack finished!'}
+             {revealedIndex > -1 && revealedIndex < packContents.length ? `Card ${revealedIndex + 1} of ${packContents.length}`: 'Pack finished!'}
         </div>
     </div>
   );
