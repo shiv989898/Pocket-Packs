@@ -4,10 +4,11 @@ import Link from 'next/link';
 import { useUser } from '@/contexts/user-provider';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Gift, PackageOpen, Layers3, Wallet, Gem, CheckCircle, Clock } from 'lucide-react';
+import { Gift, PackageOpen, Layers3, Wallet, Gem, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function DashboardPage() {
   const { collection, currency, packs, claimDailyReward, lastClaimed } = useUser();
@@ -56,8 +57,17 @@ export default function DashboardPage() {
             <Layers3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalCards}</div>
-            <p className="text-xs text-muted-foreground">{uniqueCards} unique</p>
+            {isClient ? (
+              <>
+                <div className="text-2xl font-bold">{totalCards}</div>
+                <p className="text-xs text-muted-foreground">{uniqueCards} unique</p>
+              </>
+            ) : (
+              <>
+                <Skeleton className="h-8 w-16 mb-2" />
+                <Skeleton className="h-4 w-24" />
+              </>
+            )}
           </CardContent>
         </Card>
         <Card>
@@ -101,9 +111,9 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="flex-grow flex flex-col items-center justify-center">
             <Image src="https://placehold.co/400x300.png" alt="Booster pack" width={400} height={300} className="rounded-lg mb-4" data-ai-hint="pokemon cards"/>
-            <Link href="/dashboard/open-packs" passHref>
-              <Button size="lg"><PackageOpen className="mr-2 h-4 w-4" /> Go to Pack Opener</Button>
-            </Link>
+            <Button asChild size="lg">
+              <Link href="/dashboard/open-packs"><PackageOpen className="mr-2 h-4 w-4" /> Go to Pack Opener</Link>
+            </Button>
           </CardContent>
         </Card>
         <Card className="flex flex-col">
@@ -113,9 +123,9 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="flex-grow flex flex-col items-center justify-center">
              <Image src="https://placehold.co/400x300.png" alt="Card collection" width={400} height={300} className="rounded-lg mb-4" data-ai-hint="card collection"/>
-            <Link href="/dashboard/collection" passHref>
-              <Button size="lg"><Layers3 className="mr-2 h-4 w-4" /> View Collection</Button>
-            </Link>
+            <Button asChild size="lg">
+              <Link href="/dashboard/collection"><Layers3 className="mr-2 h-4 w-4" /> View Collection</Link>
+            </Button>
           </CardContent>
         </Card>
       </div>
