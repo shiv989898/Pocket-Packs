@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
-  request: Request,
-  { params }: { params: { setId: string } }
+  request: NextRequest,
+  context: { params: { setId: string } }
 ) {
-  const { setId } = params;
+  const { setId } = context.params;
 
   if (!setId) {
     return NextResponse.json({ error: 'Set ID is required' }, { status: 400 });

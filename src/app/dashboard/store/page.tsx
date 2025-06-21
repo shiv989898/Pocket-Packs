@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useUser } from '@/contexts/user-provider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Gem, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import { currentSet } from '@/lib/pokemon-data';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const packsForSale = [
   {
@@ -38,9 +40,31 @@ const packsForSale = [
   },
 ];
 
+const SafeImage = ({ pack }: { pack: typeof packsForSale[0] }) => {
+  const [imageError, setImageError] = useState(false);
+
+  return (
+    <Image
+      src={imageError ? `https://placehold.co/400x558.png` : pack.imageUrl}
+      alt={pack.name}
+      fill
+      className="object-contain"
+      data-ai-hint={pack.aiHint}
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      onError={() => setImageError(true)}
+    />
+  );
+};
+
+
 export default function StorePage() {
   const { currency, setCurrency, addPacks } = useUser();
   const { toast } = useToast();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handlePurchase = (cost: number, amount: number, name: string) => {
     if (currency >= cost) {
@@ -67,7 +91,7 @@ export default function StorePage() {
           Spend your hard-earned currency on new booster packs!
         </p>
         <div className="inline-flex items-center justify-center gap-2 mt-4 rounded-full bg-primary/20 px-6 py-2 text-lg font-semibold text-primary-foreground">
-          <Gem className="h-6 w-6 text-primary" /> Your Balance: {currency.toLocaleString()}
+          <Gem className="h-6 w-6 text-primary" /> Your Balance: {isClient ? currency.toLocaleString() : <Skeleton className="inline-block h-6 w-16" />}
         </div>
       </div>
       
@@ -80,14 +104,7 @@ export default function StorePage() {
             </CardHeader>
             <CardContent className="flex-grow flex flex-col items-center justify-center p-4">
               <div className="relative w-full h-64 mb-4">
-                <Image 
-                  src={pack.imageUrl} 
-                  alt={pack.name} 
-                  fill 
-                  className="object-contain" 
-                  data-ai-hint={pack.aiHint}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
+                <SafeImage pack={pack} />
               </div>
               <div className="text-3xl font-bold text-primary flex items-center gap-2">
                 <Gem />
@@ -98,7 +115,7 @@ export default function StorePage() {
               <Button 
                 className="w-full text-lg py-6" 
                 onClick={() => handlePurchase(pack.cost, pack.amount, pack.name)}
-                disabled={currency < pack.cost}
+                disabled={!isClient || currency < pack.cost}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 Buy Now

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser } from '@/contexts/user-provider';
 import type { PokemonCard } from '@/lib/pokemon-data';
 import { currentSet } from '@/lib/pokemon-data';
@@ -16,6 +16,12 @@ export function PackOpener() {
   const { toast } = useToast();
   const [revealedCards, setRevealedCards] = useState<PokemonCard[]>([]);
   const [isOpening, setIsOpening] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleOpenPack = () => {
     if (packs > 0 && !isOpening) {
@@ -82,9 +88,9 @@ export function PackOpener() {
       <Sparkles className="absolute bottom-20 right-10 h-32 w-32 text-accent/30 animate-pulse" />
 
       <div className="mb-8">
-        <Button onClick={handleOpenPack} disabled={isOpening || packs <= 0} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg transform hover:scale-105 transition-transform">
+        <Button onClick={handleOpenPack} disabled={!isClient || isOpening || packs <= 0} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg transform hover:scale-105 transition-transform">
           <Gem className="mr-2 h-5 w-5" />
-          {isOpening ? 'Opening...' : `Open a Pack (${packs} left)`}
+          {isOpening ? 'Opening...' : `Open a Pack (${isClient ? packs : '...'} left)`}
         </Button>
       </div>
 
@@ -98,7 +104,14 @@ export function PackOpener() {
               animate={["shaking", "opening"]}
               exit="hidden"
             >
-              <Image src={currentSet.packImageUrl} width={250} height={453} alt={`${currentSet.name} Booster Pack`} data-ai-hint="scarlet violet booster"/>
+              <Image 
+                src={imageError ? 'https://placehold.co/250x453.png' : currentSet.packImageUrl} 
+                width={250} 
+                height={453} 
+                alt={`${currentSet.name} Booster Pack`} 
+                data-ai-hint="scarlet violet booster"
+                onError={() => setImageError(true)}
+              />
             </motion.div>
           )}
         </AnimatePresence>

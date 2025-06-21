@@ -18,6 +18,8 @@ import { Button } from './ui/button';
 import { useUser } from '@/contexts/user-provider';
 import { LayoutDashboard, PackageOpen, Layers3, Store, LogOut, Wallet, Gem } from 'lucide-react';
 import { Separator } from './ui/separator';
+import { useEffect, useState } from 'react';
+import { Skeleton } from './ui/skeleton';
 
 const menuItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -29,6 +31,11 @@ const menuItems = [
 export function MainSidebar() {
   const pathname = usePathname();
   const { currency, packs } = useUser();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   return (
     <Sidebar className="border-r" collapsible="icon">
@@ -57,11 +64,15 @@ export function MainSidebar() {
         <div className="flex flex-col gap-2 p-2 text-sm text-foreground/80 group-data-[collapsible=icon]:items-center">
           <div className="flex items-center gap-2">
               <Wallet className="h-5 w-5 text-accent" />
-              <span className="font-semibold group-data-[collapsible=icon]:hidden">{currency.toLocaleString()}</span>
+              <div className="font-semibold group-data-[collapsible=icon]:hidden w-16">
+                {isClient ? currency.toLocaleString() : <Skeleton className="h-5 w-full" />}
+              </div>
           </div>
           <div className="flex items-center gap-2">
               <Gem className="h-5 w-5 text-accent" />
-              <span className="font-semibold group-data-[collapsible=icon]:hidden">{packs} Packs</span>
+              <div className="font-semibold group-data-[collapsible=icon]:hidden w-16">
+                 {isClient ? `${packs} Packs` : <Skeleton className="h-5 w-full" />}
+              </div>
           </div>
         </div>
         <Separator className="my-2" />
