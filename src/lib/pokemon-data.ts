@@ -1,5 +1,5 @@
 export type Rarity = 'Common' | 'Uncommon' | 'Rare' | 'Ultra Rare';
-export type CardType = 'Fire' | 'Water' | 'Grass' | 'Electric' | 'Psychic' | 'Fighting' | 'Colorless' | 'Dragon';
+export type CardType = 'Fire' | 'Water' | 'Grass' | 'Electric' | 'Psychic' | 'Fighting' | 'Colorless' | 'Dragon' | 'Darkness' | 'Metal' | 'Fairy';
 
 export interface PokemonCard {
   id: string;
@@ -9,69 +9,142 @@ export interface PokemonCard {
   imageUrl: string;
 }
 
-export const MOCK_CARDS: PokemonCard[] = [
-  // Commons
-  { id: 'pika01', name: 'Pikachu', type: 'Electric', rarity: 'Common', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'cat01', name: 'Caterpie', type: 'Grass', rarity: 'Common', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'rat01', name: 'Rattata', type: 'Colorless', rarity: 'Common', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'magikarp01', name: 'Magikarp', type: 'Water', rarity: 'Common', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'zubat01', name: 'Zubat', type: 'Psychic', rarity: 'Common', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'mankey01', name: 'Mankey', type: 'Fighting', rarity: 'Common', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'weedle01', name: 'Weedle', type: 'Grass', rarity: 'Common', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'pidgey01', name: 'Pidgey', type: 'Colorless', rarity: 'Common', imageUrl: 'https://placehold.co/300x420.png', },
-
-  // Uncommons
-  { id: 'charmeleon01', name: 'Charmeleon', type: 'Fire', rarity: 'Uncommon', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'ivysaur01', name: 'Ivysaur', type: 'Grass', rarity: 'Uncommon', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'wartortle01', name: 'Wartortle', type: 'Water', rarity: 'Uncommon', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'kadabra01', name: 'Kadabra', type: 'Psychic', rarity: 'Uncommon', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'growlithe01', name: 'Growlithe', type: 'Fire', rarity: 'Uncommon', imageUrl: 'https://placehold.co/300x420.png', },
-  
-  // Rares
-  { id: 'gyarados01', name: 'Gyarados', type: 'Water', rarity: 'Rare', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'snorlax01', name: 'Snorlax', type: 'Colorless', rarity: 'Rare', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'alakazam01', name: 'Alakazam', type: 'Psychic', rarity: 'Rare', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'arcanine01', name: 'Arcanine', type: 'Fire', rarity: 'Rare', imageUrl: 'https://placehold.co/300x420.png', },
-  
-  // Ultra Rares
-  { id: 'charizard01', name: 'Charizard VMAX', type: 'Fire', rarity: 'Ultra Rare', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'mewtwo01', name: 'Mewtwo EX', type: 'Psychic', rarity: 'Ultra Rare', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'dragonite01', name: 'Dragonite V', type: 'Dragon', rarity: 'Ultra Rare', imageUrl: 'https://placehold.co/300x420.png', },
-  { id: 'blastoise01', name: 'Blastoise GX', type: 'Water', rarity: 'Ultra Rare', imageUrl: 'https://placehold.co/300x420.png', },
-];
-
-const cardsByRarity = {
-  'Common': MOCK_CARDS.filter(c => c.rarity === 'Common'),
-  'Uncommon': MOCK_CARDS.filter(c => c.rarity === 'Uncommon'),
-  'Rare': MOCK_CARDS.filter(c => c.rarity === 'Rare'),
-  'Ultra Rare': MOCK_CARDS.filter(c => c.rarity === 'Ultra Rare'),
+const rarityMapping: { [key: string]: Rarity | undefined } = {
+  'Common': 'Common',
+  'Uncommon': 'Uncommon',
+  'Rare': 'Rare',
+  'Rare Holo': 'Rare',
+  'Promo': 'Rare',
+  'Double Rare': 'Ultra Rare',
+  'Rare Holo V': 'Ultra Rare',
+  'Rare Holo VMAX': 'Ultra Rare',
+  'Rare Holo VSTAR': 'Ultra Rare',
+  'Rare Secret': 'Ultra Rare',
+  'Hyper Rare': 'Ultra Rare',
+  'Ultra Rare': 'Ultra Rare',
+  'Illustration Rare': 'Ultra Rare',
+  'Special Illustration Rare': 'Ultra Rare',
+  'Shiny Holo Rare': 'Ultra Rare',
 };
 
-const getRandomCard = (rarity: Rarity): PokemonCard => {
+const typeMapping: { [key: string]: CardType | undefined } = {
+    'Fire': 'Fire',
+    'Water': 'Water',
+    'Grass': 'Grass',
+    'Lightning': 'Electric',
+    'Psychic': 'Psychic',
+    'Fighting': 'Fighting',
+    'Colorless': 'Colorless',
+    'Dragon': 'Dragon',
+    'Darkness': 'Darkness',
+    'Metal': 'Metal',
+    'Fairy': 'Fairy'
+};
+
+
+let allCards: PokemonCard[] = [];
+let cardsByRarity: { [key in Rarity]?: PokemonCard[] } = {};
+
+async function initializeCardData() {
+  if (allCards.length > 0) return;
+
+  try {
+    const response = await fetch('https://api.pokemontcg.io/v2/cards?q=supertype:pokemon&pageSize=250');
+    if (!response.ok) {
+        throw new Error(`Failed to fetch cards: ${response.statusText}`);
+    }
+    const data = await response.json();
+    
+    const processedCards: PokemonCard[] = data.data
+      .map((apiCard: any): PokemonCard | null => {
+        const rarity = apiCard.rarity ? rarityMapping[apiCard.rarity] : undefined;
+        const type = apiCard.types ? typeMapping[apiCard.types[0]] : undefined;
+
+        if (!rarity || !type || !apiCard.images?.large) {
+          return null;
+        }
+
+        return {
+          id: apiCard.id,
+          name: apiCard.name,
+          type: type,
+          rarity: rarity,
+          imageUrl: apiCard.images.large,
+        };
+      })
+      .filter((card: PokemonCard | null): card is PokemonCard => card !== null);
+      
+    allCards = processedCards;
+    
+    cardsByRarity = { 'Common': [], 'Uncommon': [], 'Rare': [], 'Ultra Rare': [] };
+    allCards.forEach(card => {
+        if (cardsByRarity[card.rarity]) {
+            cardsByRarity[card.rarity]?.push(card);
+        }
+    });
+  } catch (error) {
+    console.error("Error initializing card data from Pokémon TCG API:", error);
+  }
+}
+
+const getRandomCard = (rarity: Rarity): PokemonCard | null => {
   const rarityPool = cardsByRarity[rarity];
+  if (!rarityPool || rarityPool.length === 0) {
+      const fallbackOrder: Rarity[] = ['Common', 'Uncommon', 'Rare', 'Ultra Rare'];
+      for (const fallbackRarity of fallbackOrder) {
+          const fallbackPool = cardsByRarity[fallbackRarity];
+          if (fallbackPool && fallbackPool.length > 0) {
+              return fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+          }
+      }
+      return null;
+  }
   return rarityPool[Math.floor(Math.random() * rarityPool.length)];
 };
 
-export const getBoosterPack = (size: number = 10): PokemonCard[] => {
+export const getBoosterPack = async (size: number = 10): Promise<PokemonCard[]> => {
+  await initializeCardData();
+
+  if (allCards.length === 0) return [];
+
   const pack: PokemonCard[] = [];
   
   // 6 Commons
   for (let i = 0; i < 6; i++) {
-    pack.push(getRandomCard('Common'));
+    pack.push(getRandomCard('Common')!);
   }
 
   // 3 Uncommons
   for (let i = 0; i < 3; i++) {
-    pack.push(getRandomCard('Uncommon'));
+    pack.push(getRandomCard('Uncommon')!);
   }
 
   // 1 Rare or Ultra Rare
   const rareRoll = Math.random();
-  if (rareRoll < 0.2) { // 20% chance for an Ultra Rare
-    pack.push(getRandomCard('Ultra Rare'));
+  if (rareRoll < 0.2) { 
+    pack.push(getRandomCard('Ultra Rare')!);
   } else {
-    pack.push(getRandomCard('Rare'));
+    pack.push(getRandomCard('Rare')!);
   }
+  
+  return pack.filter(Boolean).slice(0, size);
+};
 
-  return pack;
+export const getInitialCards = async (count: number = 8): Promise<PokemonCard[]> => {
+    await initializeCardData();
+    if (allCards.length === 0) return [];
+    
+    const initialCards: PokemonCard[] = [];
+    const usedIndices = new Set<number>();
+    
+    const numToGet = Math.min(count, allCards.length);
+    
+    while (initialCards.length < numToGet) {
+        const randomIndex = Math.floor(Math.random() * allCards.length);
+        if (!usedIndices.has(randomIndex)) {
+            initialCards.push(allCards[randomIndex]);
+            usedIndices.add(randomIndex);
+        }
+    }
+    return initialCards;
 };

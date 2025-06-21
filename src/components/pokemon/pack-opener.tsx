@@ -21,8 +21,10 @@ export function PackOpener() {
       setIsOpening(true);
       setRevealedCards([]);
 
-      setTimeout(() => {
-        const newCards = openPack();
+      const openPackPromise = openPack();
+
+      setTimeout(async () => {
+        const newCards = await openPackPromise;
         if (newCards) {
           setRevealedCards(newCards);
           toast({
@@ -31,7 +33,7 @@ export function PackOpener() {
           });
         }
         setIsOpening(false);
-      }, 2500); // Duration of the animation
+      }, 2500);
     } else if (packs <= 0) {
       toast({
         title: "No packs left!",
@@ -75,7 +77,6 @@ export function PackOpener() {
 
   return (
     <div className="relative flex flex-col items-center justify-center p-4 min-h-[60vh] overflow-hidden">
-      {/* Background elements for parallax effect */}
       <Sparkles className="absolute top-10 left-20 h-24 w-24 text-primary/30 animate-pulse" />
       <Sparkles className="absolute bottom-20 right-10 h-32 w-32 text-accent/30 animate-pulse" />
 

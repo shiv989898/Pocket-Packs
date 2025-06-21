@@ -1,7 +1,7 @@
 "use client"
 
 import type { PokemonCard } from '@/lib/pokemon-data';
-import { MOCK_CARDS, getBoosterPack } from '@/lib/pokemon-data';
+import { getInitialCards, getBoosterPack } from '@/lib/pokemon-data';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Collection = {
@@ -18,7 +18,7 @@ interface UserContextType {
   addCardsToCollection: (cards: PokemonCard[]) => void;
   setCurrency: (amount: number) => void;
   addPacks: (amount: number) => void;
-  openPack: () => PokemonCard[] | null;
+  openPack: () => Promise<PokemonCard[] | null>;
   claimDailyReward: () => void;
   lastClaimed: number | null;
 }
@@ -32,22 +32,24 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [lastClaimed, setLastClaimed] = useState<number | null>(null);
 
   useEffect(() => {
-    // This effect runs only on the client, after the initial render (hydration).
-    // This is the correct place for client-only logic like Math.random or accessing localStorage.
-    
-    // Set initial collection with random quantities.
-    const initialCollection: Collection = MOCK_CARDS.slice(0, 8).reduce((acc, card) => {
-      acc[card.id] = { card, quantity: Math.floor(Math.random() * 3) + 1 };
-      return acc;
-    }, {} as Collection);
-    setCollection(initialCollection);
+    const initializeUser = async () => {
+      const initialCards = await getInitialCards(8);
+      const initialCollection: Collection = initialCards.reduce((acc, card) => {
+        if(card) {
+          acc[card.id] = { card, quantity: Math.floor(Math.random() * 2) + 1 };
+        }
+        return acc;
+      }, {} as Collection);
+      setCollection(initialCollection);
 
-    // Get last claimed date from localStorage.
-    const savedDate = localStorage.getItem('lastClaimed');
-    if (savedDate) {
-      setLastClaimed(parseInt(savedDate, 10));
-    }
-  }, []); // The empty dependency array ensures this runs only once on mount.
+      const savedDate = localStorage.getItem('lastClaimed');
+      if (savedDate) {
+        setLastClaimed(parseInt(savedDate, 10));
+      }
+    };
+    
+    initializeUser();
+  }, []);
 
 
   const addCardsToCollection = (newCards: PokemonCard[]) => {
@@ -68,10 +70,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     setPacks(prev => prev + amount);
   };
 
-  const openPack = () => {
+  const openPack = async () => {
     if (packs > 0) {
       setPacks(prev => prev - 1);
-      const newCards = getBoosterPack();
+      const newCards = await getBoosterPack();
       addCardsToCollection(newCards);
       return newCards;
     }

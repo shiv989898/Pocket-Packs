@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Search, Info } from 'lucide-react';
 import type { CardType, Rarity } from '@/lib/pokemon-data';
 
-const cardTypes: CardType[] = ['Fire', 'Water', 'Grass', 'Electric', 'Psychic', 'Fighting', 'Colorless', 'Dragon'];
+const cardTypes: CardType[] = ['Fire', 'Water', 'Grass', 'Electric', 'Psychic', 'Fighting', 'Colorless', 'Dragon', 'Darkness', 'Metal', 'Fairy'];
 const rarities: Rarity[] = ['Common', 'Uncommon', 'Rare', 'Ultra Rare'];
 
 export default function CollectionPage() {

@@ -27,6 +27,9 @@ const typeColors: { [key in PokemonCard['type']]: string } = {
     Fighting: 'bg-orange-700',
     Colorless: 'bg-gray-400',
     Dragon: 'bg-indigo-600',
+    Darkness: 'bg-gray-800',
+    Metal: 'bg-zinc-500',
+    Fairy: 'bg-pink-400',
 };
 
 
@@ -35,7 +38,7 @@ export function PokemonCardComponent({ card, quantity }: PokemonCardProps) {
     <Card className={cn("overflow-hidden relative group transition-all duration-300 hover:scale-105 hover:z-10", rarityColors[card.rarity], 'border-4')}>
       <CardContent className="p-0">
         <div className="aspect-[3/4] relative">
-          <Image src={card.imageUrl} alt={card.name} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" data-ai-hint="pokemon art"/>
+          <Image src={card.imageUrl} alt={card.name} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover"/>
           {quantity && quantity > 1 && (
             <Badge variant="secondary" className="absolute top-2 right-2 rounded-full h-8 w-8 text-base flex items-center justify-center bg-primary text-primary-foreground border-2 border-background">
               {quantity}
