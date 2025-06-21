@@ -9,27 +9,27 @@ import Image from 'next/image';
 
 const packsForSale = [
   {
-    id: 'standard_pack',
-    name: 'Standard Booster Pack',
-    description: 'A classic pack containing 10 cards.',
+    id: 'sv_booster_pack',
+    name: 'Scarlet & Violet Booster',
+    description: 'A pack from the Scarlet & Violet series. Contains 10 cards.',
     cost: 100,
     amount: 1,
     imageUrl: 'https://placehold.co/400x420.png',
     aiHint: 'pokemon booster pack'
   },
   {
-    id: 'collectors_bundle',
-    name: "Collector's Bundle",
-    description: 'Get a great deal with 5 booster packs.',
+    id: 'sv_collectors_bundle',
+    name: "S&V Collector's Bundle",
+    description: 'A bundle of 5 Scarlet & Violet booster packs.',
     cost: 450,
     amount: 5,
     imageUrl: 'https://placehold.co/400x420.png',
     aiHint: 'pokemon booster bundle'
   },
   {
-    id: 'treasure_chest',
-    name: 'Treasure Chest',
-    description: 'A massive chest of 12 booster packs.',
+    id: 'sv_treasure_chest',
+    name: 'S&V Treasure Chest',
+    description: 'A massive chest of 12 Scarlet & Violet booster packs.',
     cost: 1000,
     amount: 12,
     imageUrl: 'https://placehold.co/400x420.png',

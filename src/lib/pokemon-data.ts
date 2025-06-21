@@ -49,7 +49,7 @@ async function initializeCardData() {
   if (allCards.length > 0) return;
 
   try {
-    const response = await fetch('https://api.pokemontcg.io/v2/cards?q=supertype:pokemon&pageSize=250');
+    const response = await fetch('https://api.pokemontcg.io/v2/cards?q=set.id:sv1&pageSize=250');
     if (!response.ok) {
         throw new Error(`Failed to fetch cards: ${response.statusText}`);
     }
