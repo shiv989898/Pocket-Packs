@@ -1,10 +1,13 @@
 'use client';
 
-import type { PokemonCard } from '@/lib/pokemon-data';
+import type { PokemonCard, Rarity } from '@/lib/pokemon-data';
 import { Card, CardContent } from '@/components/ui/card';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { Circle, Diamond, Star, Sparkles } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
 
 interface PokemonCardProps {
   card: PokemonCard;
@@ -32,6 +35,21 @@ const typeColors: { [key in PokemonCard['type']]: string } = {
     Fairy: 'bg-pink-400',
 };
 
+const RarityIcon = ({ rarity }: { rarity: Rarity }) => {
+  switch (rarity) {
+    case 'Common':
+      return <Circle className="h-3 w-3 text-muted-foreground/80" fill="currentColor" />;
+    case 'Uncommon':
+      return <Diamond className="h-3 w-3 text-secondary-foreground/80" fill="currentColor" />;
+    case 'Rare':
+      return <Star className="h-4 w-4 text-accent/80" fill="currentColor" />;
+    case 'Ultra Rare':
+      return <Sparkles className="h-4 w-4 text-primary" fill="currentColor" />;
+    default:
+      return null;
+  }
+};
+
 
 export function PokemonCardComponent({ card, quantity }: PokemonCardProps) {
   return (
@@ -49,7 +67,16 @@ export function PokemonCardComponent({ card, quantity }: PokemonCardProps) {
             <h3 className="font-bold truncate text-sm">{card.name}</h3>
             <div className="flex items-center justify-between text-xs mt-1">
                 <Badge className={cn("text-white", typeColors[card.type])}>{card.type}</Badge>
-                <span className="text-muted-foreground">{card.rarity}</span>
+                <TooltipProvider delayDuration={100}>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <RarityIcon rarity={card.rarity} />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{card.rarity}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
             </div>
         </div>
       </CardContent>
