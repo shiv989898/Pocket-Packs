@@ -25,23 +25,41 @@ export const swordAndShieldEraSets: SetInfo[] = [
 ];
 
 const rarityMapping: { [key: string]: Rarity | undefined } = {
+  // Common
   'Common': 'Common',
+
+  // Uncommon
   'Uncommon': 'Uncommon',
+
+  // Rare
   'Rare': 'Rare',
-  'Promo': 'Rare',
   'Rare Holo': 'Rare',
-  'Double Rare': 'Ultra Rare',
-  'Ultra Rare': 'Ultra Rare',
-  'Illustration Rare': 'Ultra Rare',
-  'Special Illustration Rare': 'Ultra Rare',
-  'Hyper Rare': 'Ultra Rare',
-  'Secret Rare': 'Ultra Rare',
+  'Promo': 'Rare', // Promos can vary, but this is a safe bucket
+
+  // Ultra Rare - this bucket includes various special and high-value rarities
   'Rare Holo V': 'Ultra Rare',
   'Rare Holo VMAX': 'Ultra Rare',
+  'Rare Holo VSTAR': 'Ultra Rare',
+  'Rare Holo GX': 'Ultra Rare',
+  'Rare Holo EX': 'Ultra Rare',
+  'Double Rare': 'Ultra Rare',
+  'Triple Rare': 'Ultra Rare',
   'Amazing Rare': 'Ultra Rare',
+  'Illustration Rare': 'Ultra Rare',
+  'Special Illustration Rare': 'Ultra Rare',
+  'Ultra Rare': 'Ultra Rare',
+  'Secret Rare': 'Ultra Rare',
   'Rare Secret': 'Ultra Rare',
+  'Hyper Rare': 'Ultra Rare',
+  'Rare Rainbow': 'Ultra Rare', // Often used for Hyper Rares
   'Shiny Rare': 'Ultra Rare',
-  'Rare Rainbow': 'Ultra Rare',
+  'Shiny Holo Rare': 'Ultra Rare',
+  'Radiant Rare': 'Ultra Rare',
+  'Rare BREAK': 'Ultra Rare',
+  'Rare Prism Star': 'Ultra Rare',
+  'Rare Prime': 'Ultra Rare',
+  'LEGEND': 'Ultra Rare',
+  'Rare ACE': 'Ultra Rare',
 };
 
 const typeMapping: { [key in string]: CardType | undefined } = {
@@ -77,9 +95,10 @@ async function initializeCardData(setId: string): Promise<CardData | null> {
         console.error(`Error fetching card data for set ${setId} via proxy:`, response.status, errorBody);
         throw new Error(`Failed to fetch cards: ${response.status} ${errorBody}`);
     }
-    const data = await response.json();
+    const apiResponse = await response.json();
+    const rawCards = Array.isArray(apiResponse) ? apiResponse : apiResponse.data;
     
-    const processedCards: PokemonCard[] = data
+    const processedCards: PokemonCard[] = rawCards
       .map((apiCard: any): PokemonCard | null => {
         const rarity = apiCard.rarity ? rarityMapping[apiCard.rarity] : undefined;
         const isPokemon = apiCard.supertype === 'Pokémon';
