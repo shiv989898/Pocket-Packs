@@ -14,7 +14,7 @@ const packsForSale = [
     description: 'A pack from the Scarlet & Violet series. Contains 10 cards.',
     cost: 100,
     amount: 1,
-    imageUrl: 'https://placehold.co/400x420.png',
+    imageUrl: 'https://images.pokemontcg.io/sv1/pack.png',
     aiHint: 'scarlet violet booster'
   },
   {
@@ -23,7 +23,7 @@ const packsForSale = [
     description: 'A bundle of 5 Scarlet & Violet booster packs.',
     cost: 450,
     amount: 5,
-    imageUrl: 'https://placehold.co/400x420.png',
+    imageUrl: 'https://images.pokemontcg.io/sv1/pack.png',
     aiHint: 'pokemon booster bundle'
   },
   {
@@ -32,7 +32,7 @@ const packsForSale = [
     description: 'A massive chest of 12 Scarlet & Violet booster packs.',
     cost: 1000,
     amount: 12,
-    imageUrl: 'https://placehold.co/400x420.png',
+    imageUrl: 'https://images.pokemontcg.io/sv1/pack.png',
     aiHint: 'pokemon treasure chest'
   },
 ];
@@ -77,8 +77,17 @@ export default function StorePage() {
               <CardTitle className="text-2xl">{pack.name}</CardTitle>
               <CardDescription>{pack.description}</CardDescription>
             </CardHeader>
-            <CardContent className="flex-grow flex flex-col items-center justify-center">
-              <Image src={pack.imageUrl} alt={pack.name} width={400} height={420} className="rounded-lg mb-4 object-cover aspect-[1/1.2]" data-ai-hint={pack.aiHint}/>
+            <CardContent className="flex-grow flex flex-col items-center justify-center p-4">
+              <div className="relative w-full h-64 mb-4">
+                <Image 
+                  src={pack.imageUrl} 
+                  alt={pack.name} 
+                  fill 
+                  className="object-contain" 
+                  data-ai-hint={pack.aiHint}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
               <div className="text-3xl font-bold text-primary flex items-center gap-2">
                 <Gem />
                 {pack.cost.toLocaleString()}

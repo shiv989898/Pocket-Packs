@@ -97,7 +97,7 @@ export function PackOpener() {
               animate={["shaking", "opening"]}
               exit="hidden"
             >
-              <Image src="https://placehold.co/300x420.png" width={300} height={420} alt="Scarlet & Violet Booster Pack" data-ai-hint="scarlet violet booster"/>
+              <Image src="https://images.pokemontcg.io/sv1/pack.png" width={250} height={453} alt="Scarlet & Violet Booster Pack" data-ai-hint="scarlet violet booster"/>
             </motion.div>
           )}
         </AnimatePresence>
