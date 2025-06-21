@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useUser } from '@/contexts/user-provider';
 import type { PokemonCard } from '@/lib/pokemon-data';
+import { currentSet } from '@/lib/pokemon-data';
 import { Button } from '@/components/ui/button';
 import { PokemonCardComponent } from './pokemon-card';
 import { useToast } from '@/hooks/use-toast';
@@ -97,7 +98,7 @@ export function PackOpener() {
               animate={["shaking", "opening"]}
               exit="hidden"
             >
-              <Image src="https://images.pokemontcg.io/sv1/pack.png" width={250} height={453} alt="Scarlet & Violet Booster Pack" data-ai-hint="scarlet violet booster"/>
+              <Image src={currentSet.packImageUrl} width={250} height={453} alt={`${currentSet.name} Booster Pack`} data-ai-hint="scarlet violet booster"/>
             </motion.div>
           )}
         </AnimatePresence>

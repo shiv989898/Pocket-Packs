@@ -6,33 +6,34 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { Gem, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
+import { currentSet } from '@/lib/pokemon-data';
 
 const packsForSale = [
   {
-    id: 'sv_booster_pack',
-    name: 'Scarlet & Violet Booster',
-    description: 'A pack from the Scarlet & Violet series. Contains 10 cards.',
+    id: `${currentSet.id}_booster_pack`,
+    name: `${currentSet.name} Booster`,
+    description: `A pack from the ${currentSet.name} series. Contains 10 cards.`,
     cost: 100,
     amount: 1,
-    imageUrl: 'https://images.pokemontcg.io/sv1/pack.png',
+    imageUrl: currentSet.packImageUrl,
     aiHint: 'scarlet violet booster'
   },
   {
-    id: 'sv_collectors_bundle',
-    name: "S&V Collector's Bundle",
-    description: 'A bundle of 5 Scarlet & Violet booster packs.',
+    id: `${currentSet.id}_collectors_bundle`,
+    name: `${currentSet.name} Collector's Bundle`,
+    description: `A bundle of 5 ${currentSet.name} booster packs.`,
     cost: 450,
     amount: 5,
-    imageUrl: 'https://images.pokemontcg.io/sv1/pack.png',
+    imageUrl: currentSet.packImageUrl,
     aiHint: 'pokemon booster bundle'
   },
   {
-    id: 'sv_treasure_chest',
-    name: 'S&V Treasure Chest',
-    description: 'A massive chest of 12 Scarlet & Violet booster packs.',
+    id: `${currentSet.id}_treasure_chest`,
+    name: `${currentSet.name} Treasure Chest`,
+    description: `A massive chest of 12 ${currentSet.name} booster packs.`,
     cost: 1000,
     amount: 12,
-    imageUrl: 'https://images.pokemontcg.io/sv1/pack.png',
+    imageUrl: currentSet.packImageUrl,
     aiHint: 'pokemon treasure chest'
   },
 ];
