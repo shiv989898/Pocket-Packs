@@ -9,13 +9,13 @@ export interface PokemonCard {
   imageUrl: string;
 }
 
-const CURRENT_SET_ID = 'sv2';
-const CURRENT_SET_NAME = 'Paldea Evolved';
+const CURRENT_SET_ID = 'swsh1';
+const CURRENT_SET_NAME = 'Sword & Shield';
 
 export const currentSet = {
   id: CURRENT_SET_ID,
   name: CURRENT_SET_NAME,
-  packImageUrl: `https://assets.tcgdex.net/en/sv/sv2/logo.png`,
+  packImageUrl: `https://assets.tcgdex.net/en/swsh/swsh1/logo.png`,
 };
 
 const rarityMapping: { [key: string]: Rarity | undefined } = {
@@ -23,12 +23,18 @@ const rarityMapping: { [key: string]: Rarity | undefined } = {
   'Uncommon': 'Uncommon',
   'Rare': 'Rare',
   'Promo': 'Rare',
+  'Rare Holo': 'Rare',
   'Double Rare': 'Ultra Rare',
   'Ultra Rare': 'Ultra Rare',
   'Illustration Rare': 'Ultra Rare',
   'Special Illustration Rare': 'Ultra Rare',
   'Hyper Rare': 'Ultra Rare',
   'Secret Rare': 'Ultra Rare',
+  'Rare Holo V': 'Ultra Rare',
+  'Rare Holo VMAX': 'Ultra Rare',
+  'Amazing Rare': 'Ultra Rare',
+  'Rare Secret': 'Ultra Rare',
+  'Shiny Rare': 'Ultra Rare',
 };
 
 const typeMapping: { [key in string]: CardType | undefined } = {
@@ -55,7 +61,9 @@ async function initializeCardData() {
   try {
     const response = await fetch(`/api/cards/${currentSet.id}`);
     if (!response.ok) {
-        throw new Error(`Failed to fetch cards: ${response.status} ${response.statusText}`);
+        const errorBody = await response.text();
+        console.error("Error fetching card data via proxy:", response.status, errorBody);
+        throw new Error(`Failed to fetch cards: ${response.status}`);
     }
     const data = await response.json();
     
@@ -87,13 +95,15 @@ async function initializeCardData() {
         }
     });
   } catch (error) {
-    console.error("Error initializing card data from TCGdex API:", error);
+    console.error("Error initializing card data:", error);
+    // Return empty so the app doesn't crash
   }
 }
 
 const getRandomCard = (rarity: Rarity): PokemonCard | null => {
   const rarityPool = cardsByRarity[rarity];
   if (!rarityPool || rarityPool.length === 0) {
+      // Fallback if a specific rarity is not available in the set
       const fallbackOrder: Rarity[] = ['Common', 'Uncommon', 'Rare', 'Ultra Rare'];
       for (const fallbackRarity of fallbackOrder) {
           const fallbackPool = cardsByRarity[fallbackRarity];
@@ -125,34 +135,30 @@ export const getBoosterPack = async (size: number = 10): Promise<PokemonCard[]> 
     if (card) pack.push(card);
   }
 
-  // 1 Rare or Ultra Rare
-  const rareRoll = Math.random();
-  if (rareRoll < 0.2) { 
-    const card = getRandomCard('Ultra Rare');
-    if (card) pack.push(card);
-  } else {
-    const card = getRandomCard('Rare');
+  // 1 Rare slot (with a chance for Ultra Rare)
+  const isUltraRare = Math.random() < 0.125; // 12.5% chance
+  const rareCard = getRandomCard(isUltraRare ? 'Ultra Rare' : 'Rare');
+  if (rareCard) {
+    pack.push(rareCard);
+  }
+
+  // Ensure pack has `size` cards, fill with commons if needed
+  while (pack.length < size) {
+    const card = getRandomCard('Common');
     if (card) pack.push(card);
   }
-  
-  return pack.filter(Boolean).slice(0, size);
+
+  return pack.slice(0, size);
 };
 
-export const getInitialCards = async (count: number = 8): Promise<PokemonCard[]> => {
+export const getInitialCards = async (count: number): Promise<PokemonCard[]> => {
     await initializeCardData();
     if (allCards.length === 0) return [];
     
     const initialCards: PokemonCard[] = [];
-    const usedIndices = new Set<number>();
-    
-    const numToGet = Math.min(count, allCards.length);
-    
-    while (initialCards.length < numToGet) {
+    for (let i = 0; i < count; i++) {
         const randomIndex = Math.floor(Math.random() * allCards.length);
-        if (!usedIndices.has(randomIndex)) {
-            initialCards.push(allCards[randomIndex]);
-            usedIndices.add(randomIndex);
-        }
+        initialCards.push(allCards[randomIndex]);
     }
     return initialCards;
-};
+}
