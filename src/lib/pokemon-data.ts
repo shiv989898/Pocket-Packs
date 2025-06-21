@@ -15,28 +15,23 @@ const CURRENT_SET_NAME = 'Scarlet & Violet';
 export const currentSet = {
   id: CURRENT_SET_ID,
   name: CURRENT_SET_NAME,
-  packImageUrl: `https://images.pokemontcg.io/${CURRENT_SET_ID}/pack.png`,
+  packImageUrl: `https://assets.tcgdex.net/en/sv/sv1/logo.png`,
 };
 
 const rarityMapping: { [key: string]: Rarity | undefined } = {
   'Common': 'Common',
   'Uncommon': 'Uncommon',
   'Rare': 'Rare',
-  'Rare Holo': 'Rare',
   'Promo': 'Rare',
   'Double Rare': 'Ultra Rare',
-  'Rare Holo V': 'Ultra Rare',
-  'Rare Holo VMAX': 'Ultra Rare',
-  'Rare Holo VSTAR': 'Ultra Rare',
-  'Rare Secret': 'Ultra Rare',
-  'Hyper Rare': 'Ultra Rare',
   'Ultra Rare': 'Ultra Rare',
   'Illustration Rare': 'Ultra Rare',
   'Special Illustration Rare': 'Ultra Rare',
-  'Shiny Holo Rare': 'Ultra Rare',
+  'Hyper Rare': 'Ultra Rare',
+  'Secret Rare': 'Ultra Rare',
 };
 
-const typeMapping: { [key: string]: CardType | undefined } = {
+const typeMapping: { [key in string]: CardType | undefined } = {
     'Fire': 'Fire',
     'Water': 'Water',
     'Grass': 'Grass',
@@ -58,18 +53,18 @@ async function initializeCardData() {
   if (allCards.length > 0) return;
 
   try {
-    const response = await fetch(`https://api.pokemontcg.io/v2/cards?q=set.id:${currentSet.id}&pageSize=250`);
+    const response = await fetch(`https://api.tcgdex.net/v2/en/sets/${currentSet.id}`);
     if (!response.ok) {
         throw new Error(`Failed to fetch cards: ${response.statusText}`);
     }
     const data = await response.json();
     
-    const processedCards: PokemonCard[] = data.data
+    const processedCards: PokemonCard[] = data.cards
       .map((apiCard: any): PokemonCard | null => {
         const rarity = apiCard.rarity ? rarityMapping[apiCard.rarity] : undefined;
-        const type = apiCard.types ? typeMapping[apiCard.types[0]] : undefined;
+        const type = (apiCard.types && apiCard.types.length > 0) ? typeMapping[apiCard.types[0]] : undefined;
 
-        if (!rarity || !type || !apiCard.images?.large) {
+        if (!rarity || !type || !apiCard.image || apiCard.category !== 'Pokémon') {
           return null;
         }
 
@@ -78,7 +73,7 @@ async function initializeCardData() {
           name: apiCard.name,
           type: type,
           rarity: rarity,
-          imageUrl: apiCard.images.large,
+          imageUrl: `${apiCard.image}/high.webp`,
         };
       })
       .filter((card: PokemonCard | null): card is PokemonCard => card !== null);
@@ -92,7 +87,7 @@ async function initializeCardData() {
         }
     });
   } catch (error) {
-    console.error("Error initializing card data from Pokémon TCG API:", error);
+    console.error("Error initializing card data from TCGdex API:", error);
   }
 }
 
