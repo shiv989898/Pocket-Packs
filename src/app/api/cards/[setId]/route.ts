@@ -12,7 +12,7 @@ export async function GET(
 
   try {
     const apiUrl = `https://api.tcgdex.net/v2/en/sets/${setId}`;
-    const response = await fetch(apiUrl);
+    const response = await fetch(apiUrl, { next: { revalidate: 3600 } }); // cache for 1 hour
 
     if (!response.ok) {
       const errorData = await response.text();
