@@ -27,7 +27,7 @@ export default function CollectionPage() {
   return (
     <div className="container mx-auto">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold tracking-tight">Your Card Collection</h1>
+        <h1 className="text-4xl font-headline font-bold tracking-tight">Your Card Collection</h1>
         <p className="text-lg text-muted-foreground">
           Browse, search, and admire your hard-earned cards.
         </p>

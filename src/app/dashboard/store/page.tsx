@@ -15,6 +15,7 @@ const packsForSale = [
     cost: 100,
     amount: 1,
     imageUrl: 'https://placehold.co/400x420.png',
+    aiHint: 'pokemon booster pack'
   },
   {
     id: 'collectors_bundle',
@@ -23,6 +24,7 @@ const packsForSale = [
     cost: 450,
     amount: 5,
     imageUrl: 'https://placehold.co/400x420.png',
+    aiHint: 'pokemon booster bundle'
   },
   {
     id: 'treasure_chest',
@@ -31,6 +33,7 @@ const packsForSale = [
     cost: 1000,
     amount: 12,
     imageUrl: 'https://placehold.co/400x420.png',
+    aiHint: 'pokemon treasure chest'
   },
 ];
 
@@ -58,7 +61,7 @@ export default function StorePage() {
   return (
     <div className="container mx-auto">
       <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold tracking-tight">The Poké Mart</h1>
+        <h1 className="text-4xl font-headline font-bold tracking-tight">The Poké Mart</h1>
         <p className="text-lg text-muted-foreground">
           Spend your hard-earned currency on new booster packs!
         </p>
@@ -75,7 +78,7 @@ export default function StorePage() {
               <CardDescription>{pack.description}</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow flex flex-col items-center justify-center">
-              <Image src={pack.imageUrl} alt={pack.name} width={400} height={420} className="rounded-lg mb-4 object-cover aspect-[1/1.2]" data-ai-hint="pokemon cards"/>
+              <Image src={pack.imageUrl} alt={pack.name} width={400} height={420} className="rounded-lg mb-4 object-cover aspect-[1/1.2]" data-ai-hint={pack.aiHint}/>
               <div className="text-3xl font-bold text-primary flex items-center gap-2">
                 <Gem />
                 {pack.cost.toLocaleString()}

@@ -12,7 +12,7 @@ export default function LoginPage() {
             <div className="mx-auto mb-4">
               <AppLogo />
             </div>
-            <CardTitle className="text-3xl font-bold">Welcome Back!</CardTitle>
+            <CardTitle className="text-3xl font-bold font-headline">Welcome Back!</CardTitle>
             <CardDescription>Enter your credentials to access your collection.</CardDescription>
           </CardHeader>
           <CardContent>

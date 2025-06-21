@@ -12,7 +12,7 @@ export default function SignUpPage() {
              <div className="mx-auto mb-4">
               <AppLogo />
             </div>
-            <CardTitle className="text-3xl font-bold">Create an Account</CardTitle>
+            <CardTitle className="text-3xl font-bold font-headline">Create an Account</CardTitle>
             <CardDescription>Join the community and start your collection!</CardDescription>
           </CardHeader>
           <CardContent>

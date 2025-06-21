@@ -12,10 +12,10 @@ interface PokemonCardProps {
 }
 
 const rarityColors = {
-  'Common': 'border-transparent',
-  'Uncommon': 'border-green-400',
-  'Rare': 'border-blue-400',
-  'Ultra Rare': 'border-purple-500 shadow-lg shadow-purple-500/50',
+  'Common': 'border-muted/30',
+  'Uncommon': 'border-secondary',
+  'Rare': 'border-accent/70',
+  'Ultra Rare': 'border-primary shadow-lg shadow-primary/40 hover:shadow-primary/60 transition-shadow',
 };
 
 const typeColors: { [key in PokemonCard['type']]: string } = {
