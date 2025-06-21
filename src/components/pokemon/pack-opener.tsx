@@ -2,14 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { useUser } from '@/contexts/user-provider';
-import type { PokemonCard } from '@/lib/pokemon-data';
-import { currentSet } from '@/lib/pokemon-data';
+import type { PokemonCard, SetInfo } from '@/lib/pokemon-data';
+import { swordAndShieldEraSets } from '@/lib/pokemon-data';
 import { Button } from '@/components/ui/button';
 import { PokemonCardComponent } from './pokemon-card';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Gem, Package, Sparkles } from 'lucide-react';
 import Image from 'next/image';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export function PackOpener() {
   const { packs, openPack } = useUser();
@@ -18,6 +19,7 @@ export function PackOpener() {
   const [isOpening, setIsOpening] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [selectedSetId, setSelectedSetId] = useState<string>(swordAndShieldEraSets[0].id);
 
   useEffect(() => {
     setIsClient(true);
@@ -28,7 +30,7 @@ export function PackOpener() {
       setIsOpening(true);
       setRevealedCards([]);
 
-      const openPackPromise = openPack();
+      const openPackPromise = openPack(selectedSetId);
 
       setTimeout(async () => {
         const newCards = await openPackPromise;
@@ -37,6 +39,12 @@ export function PackOpener() {
           toast({
             title: "Pack Opened!",
             description: `You got ${newCards.length} new cards!`,
+          });
+        } else {
+           toast({
+            title: "Error opening pack",
+            description: "Could not retrieve cards for the selected set. Your pack has not been used.",
+            variant: "destructive",
           });
         }
         setIsOpening(false);
@@ -49,6 +57,8 @@ export function PackOpener() {
       });
     }
   };
+  
+  const selectedSet = swordAndShieldEraSets.find(s => s.id === selectedSetId) || swordAndShieldEraSets[0];
 
   const packVariants = {
     initial: { scale: 1, rotate: 0 },
@@ -87,8 +97,18 @@ export function PackOpener() {
       <Sparkles className="absolute top-10 left-20 h-24 w-24 text-primary/30 animate-pulse" />
       <Sparkles className="absolute bottom-20 right-10 h-32 w-32 text-accent/30 animate-pulse" />
 
-      <div className="mb-8">
-        <Button onClick={handleOpenPack} disabled={!isClient || isOpening || packs <= 0} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg transform hover:scale-105 transition-transform">
+       <div className="mb-8 flex flex-col sm:flex-row items-center gap-4">
+        <Select value={selectedSetId} onValueChange={(value) => { setSelectedSetId(value); setImageError(false); }} disabled={isOpening}>
+            <SelectTrigger className="w-full sm:w-[240px]">
+                <SelectValue placeholder="Select a Set" />
+            </SelectTrigger>
+            <SelectContent>
+                {swordAndShieldEraSets.map(set => (
+                    <SelectItem key={set.id} value={set.id}>{set.name}</SelectItem>
+                ))}
+            </SelectContent>
+        </Select>
+        <Button onClick={handleOpenPack} disabled={!isClient || isOpening || packs <= 0} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg transform hover:scale-105 transition-transform w-full sm:w-auto">
           <Gem className="mr-2 h-5 w-5" />
           {isOpening ? 'Opening...' : `Open a Pack (${isClient ? packs : '...'} left)`}
         </Button>
@@ -105,12 +125,14 @@ export function PackOpener() {
               exit="hidden"
             >
               <Image 
-                src={imageError ? 'https://placehold.co/250x453.png' : currentSet.packImageUrl} 
+                src={imageError ? 'https://placehold.co/250x453.png' : selectedSet.packImageUrl} 
                 width={250} 
-                height={453} 
-                alt={`${currentSet.name} Booster Pack`} 
-                data-ai-hint="scarlet violet booster"
+                height={250} 
+                alt={`${selectedSet.name} Booster Pack`} 
+                data-ai-hint="pokemon booster"
+                className="object-contain"
                 onError={() => setImageError(true)}
+                unoptimized
               />
             </motion.div>
           )}
@@ -134,7 +156,7 @@ export function PackOpener() {
         {!isOpening && revealedCards.length === 0 && (
           <div className="text-center text-muted-foreground">
             <Package className="mx-auto h-24 w-24 mb-4" />
-            <p className="text-lg">Your new cards will appear here.</p>
+            <p className="text-lg">Select a set and open a pack!</p>
           </div>
         )}
       </div>

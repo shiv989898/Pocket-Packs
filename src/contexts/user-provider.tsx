@@ -18,7 +18,7 @@ interface UserContextType {
   addCardsToCollection: (cards: PokemonCard[]) => void;
   setCurrency: (amount: number) => void;
   addPacks: (amount: number) => void;
-  openPack: () => Promise<PokemonCard[] | null>;
+  openPack: (setId: string) => Promise<PokemonCard[] | null>;
   claimDailyReward: () => void;
   lastClaimed: number | null;
 }
@@ -70,12 +70,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     setPacks(prev => prev + amount);
   };
 
-  const openPack = async () => {
+  const openPack = async (setId: string) => {
     if (packs > 0) {
-      setPacks(prev => prev - 1);
-      const newCards = await getBoosterPack();
-      addCardsToCollection(newCards);
-      return newCards;
+      const newCards = await getBoosterPack(setId);
+      if (newCards && newCards.length > 0) {
+        setPacks(prev => prev - 1);
+        addCardsToCollection(newCards);
+        return newCards;
+      }
     }
     return null;
   };

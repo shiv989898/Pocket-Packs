@@ -7,35 +7,35 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import { Gem, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
-import { currentSet } from '@/lib/pokemon-data';
+import { swordAndShieldEraSets } from '@/lib/pokemon-data';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const packsForSale = [
   {
-    id: `${currentSet.id}_booster_pack`,
-    name: `${currentSet.name} Booster`,
-    description: `A pack from the ${currentSet.name} series. Contains 10 cards.`,
+    id: 'booster_pack_1',
+    name: 'Booster Pack',
+    description: 'A pack that can be opened for any available set. Contains 10 cards.',
     cost: 100,
     amount: 1,
-    imageUrl: currentSet.packImageUrl,
-    aiHint: 'scarlet violet booster'
+    imageUrl: swordAndShieldEraSets[0].packImageUrl,
+    aiHint: 'pokemon booster'
   },
   {
-    id: `${currentSet.id}_collectors_bundle`,
-    name: `${currentSet.name} Collector's Bundle`,
-    description: `A bundle of 5 ${currentSet.name} booster packs.`,
+    id: 'collectors_bundle_5',
+    name: "Collector's Bundle",
+    description: 'A bundle of 5 booster packs.',
     cost: 450,
     amount: 5,
-    imageUrl: currentSet.packImageUrl,
+    imageUrl: swordAndShieldEraSets[2].packImageUrl,
     aiHint: 'pokemon booster bundle'
   },
   {
-    id: `${currentSet.id}_treasure_chest`,
-    name: `${currentSet.name} Treasure Chest`,
-    description: `A massive chest of 12 ${currentSet.name} booster packs.`,
+    id: 'treasure_chest_12',
+    name: 'Treasure Chest',
+    description: 'A massive chest of 12 booster packs.',
     cost: 1000,
     amount: 12,
-    imageUrl: currentSet.packImageUrl,
+    imageUrl: swordAndShieldEraSets[4].packImageUrl,
     aiHint: 'pokemon treasure chest'
   },
 ];
@@ -45,13 +45,14 @@ const SafeImage = ({ pack }: { pack: typeof packsForSale[0] }) => {
 
   return (
     <Image
-      src={imageError ? `https://placehold.co/400x558.png` : pack.imageUrl}
+      src={imageError ? `https://placehold.co/400x400.png` : pack.imageUrl}
       alt={pack.name}
       fill
       className="object-contain"
       data-ai-hint={pack.aiHint}
       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
       onError={() => setImageError(true)}
+      unoptimized
     />
   );
 };

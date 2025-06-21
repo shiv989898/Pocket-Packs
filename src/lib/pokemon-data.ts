@@ -9,18 +9,21 @@ export interface PokemonCard {
   imageUrl: string;
 }
 
-// Switched to a new set from pokemontcg.io API
-const CURRENT_SET_ID = 'swsh1';
-const CURRENT_SET_NAME = 'Sword & Shield';
+export interface SetInfo {
+  id: string;
+  name: string;
+  series: string;
+  packImageUrl: string;
+}
 
-export const currentSet = {
-  id: CURRENT_SET_ID,
-  name: CURRENT_SET_NAME,
-  // Using the logo from pokemontcg.io for the pack image
-  packImageUrl: `https://images.pokemontcg.io/swsh1/logo.png`,
-};
+export const swordAndShieldEraSets: SetInfo[] = [
+  { id: 'swsh1', name: 'Sword & Shield', series: 'Sword & Shield', packImageUrl: 'https://images.pokemontcg.io/swsh1/logo.png' },
+  { id: 'swsh2', name: 'Rebel Clash', series: 'Sword & Shield', packImageUrl: 'https://images.pokemontcg.io/swsh2/logo.png' },
+  { id: 'swsh3', name: 'Darkness Ablaze', series: 'Sword & Shield', packImageUrl: 'https://images.pokemontcg.io/swsh3/logo.png' },
+  { id: 'swsh4', name: 'Vivid Voltage', series: 'Sword & Shield', packImageUrl: 'https://images.pokemontcg.io/swsh4/logo.png' },
+  { id: 'swsh5', name: 'Battle Styles', series: 'Sword & Shield', packImageUrl: 'https://images.pokemontcg.io/swsh5/logo.png' },
+];
 
-// Updated rarity mapping for pokemontcg.io API
 const rarityMapping: { [key: string]: Rarity | undefined } = {
   'Common': 'Common',
   'Uncommon': 'Uncommon',
@@ -41,7 +44,6 @@ const rarityMapping: { [key: string]: Rarity | undefined } = {
   'Rare Rainbow': 'Ultra Rare',
 };
 
-// Type mapping for pokemontcg.io (Lightning -> Electric)
 const typeMapping: { [key in string]: CardType | undefined } = {
     'Fire': 'Fire',
     'Water': 'Water',
@@ -56,27 +58,30 @@ const typeMapping: { [key in string]: CardType | undefined } = {
     'Fairy': 'Fairy'
 };
 
+type CardData = {
+  allCards: PokemonCard[];
+  cardsByRarity: { [key in Rarity]?: PokemonCard[] };
+};
 
-let allCards: PokemonCard[] = [];
-let cardsByRarity: { [key in Rarity]?: PokemonCard[] } = {};
+const cardDataCache = new Map<string, CardData>();
 
-async function initializeCardData() {
-  if (allCards.length > 0) return;
+async function initializeCardData(setId: string): Promise<CardData | null> {
+  if (cardDataCache.has(setId)) {
+    return cardDataCache.get(setId)!;
+  }
 
   try {
-    const response = await fetch(`/api/cards/${currentSet.id}`);
+    const response = await fetch(`/api/cards/${setId}`);
     if (!response.ok) {
         const errorBody = await response.text();
-        console.error("Error fetching card data via proxy:", response.status, errorBody);
+        console.error(`Error fetching card data for set ${setId} via proxy:`, response.status, errorBody);
         throw new Error(`Failed to fetch cards: ${response.status} ${errorBody}`);
     }
     const data = await response.json();
     
-    // pokemontcg.io API returns an array directly from our proxy
     const processedCards: PokemonCard[] = data
       .map((apiCard: any): PokemonCard | null => {
         const rarity = apiCard.rarity ? rarityMapping[apiCard.rarity] : undefined;
-        // The API provides `supertype` which should be 'Pokémon'
         const isPokemon = apiCard.supertype === 'Pokémon';
         const type = (apiCard.types && apiCard.types.length > 0) ? typeMapping[apiCard.types[0]] : undefined;
 
@@ -94,24 +99,28 @@ async function initializeCardData() {
       })
       .filter((card: PokemonCard | null): card is PokemonCard => card !== null);
       
-    allCards = processedCards;
-    
-    cardsByRarity = { 'Common': [], 'Uncommon': [], 'Rare': [], 'Ultra Rare': [] };
-    allCards.forEach(card => {
-        if (cardsByRarity[card.rarity]) {
-            cardsByRarity[card.rarity]?.push(card);
+    const setData: CardData = {
+        allCards: processedCards,
+        cardsByRarity: { 'Common': [], 'Uncommon': [], 'Rare': [], 'Ultra Rare': [] }
+    };
+
+    processedCards.forEach(card => {
+        if (setData.cardsByRarity[card.rarity]) {
+            setData.cardsByRarity[card.rarity]?.push(card);
         }
     });
+
+    cardDataCache.set(setId, setData);
+    return setData;
   } catch (error) {
-    console.error("Error initializing card data:", error);
-    // Return empty so the app doesn't crash
+    console.error(`Error initializing card data for set ${setId}:`, error);
+    return null;
   }
 }
 
-const getRandomCard = (rarity: Rarity): PokemonCard | null => {
+const getRandomCard = (cardsByRarity: { [key in Rarity]?: PokemonCard[] }, rarity: Rarity): PokemonCard | null => {
   const rarityPool = cardsByRarity[rarity];
   if (!rarityPool || rarityPool.length === 0) {
-      // Fallback if a specific rarity is not available in the set
       const fallbackOrder: Rarity[] = ['Common', 'Uncommon', 'Rare', 'Ultra Rare'];
       for (const fallbackRarity of fallbackOrder) {
           const fallbackPool = cardsByRarity[fallbackRarity];
@@ -124,35 +133,31 @@ const getRandomCard = (rarity: Rarity): PokemonCard | null => {
   return rarityPool[Math.floor(Math.random() * rarityPool.length)];
 };
 
-export const getBoosterPack = async (size: number = 10): Promise<PokemonCard[]> => {
-  await initializeCardData();
+export const getBoosterPack = async (setId: string, size: number = 10): Promise<PokemonCard[]> => {
+  const setData = await initializeCardData(setId);
 
-  if (allCards.length === 0) return [];
+  if (!setData || setData.allCards.length === 0) return [];
 
   const pack: PokemonCard[] = [];
   
-  // 6 Commons
   for (let i = 0; i < 6; i++) {
-    const card = getRandomCard('Common');
+    const card = getRandomCard(setData.cardsByRarity, 'Common');
     if (card) pack.push(card);
   }
 
-  // 3 Uncommons
   for (let i = 0; i < 3; i++) {
-    const card = getRandomCard('Uncommon');
+    const card = getRandomCard(setData.cardsByRarity, 'Uncommon');
     if (card) pack.push(card);
   }
 
-  // 1 Rare slot (with a chance for Ultra Rare)
   const isUltraRare = Math.random() < 0.125; // 12.5% chance
-  const rareCard = getRandomCard(isUltraRare ? 'Ultra Rare' : 'Rare');
+  const rareCard = getRandomCard(setData.cardsByRarity, isUltraRare ? 'Ultra Rare' : 'Rare');
   if (rareCard) {
     pack.push(rareCard);
   }
 
-  // Ensure pack has `size` cards, fill with commons if needed
-  while (pack.length < size) {
-    const card = getRandomCard('Common');
+  while (pack.length < size && setData.allCards.length > 0) {
+    const card = getRandomCard(setData.cardsByRarity, 'Common');
     if (card) pack.push(card);
   }
 
@@ -160,13 +165,14 @@ export const getBoosterPack = async (size: number = 10): Promise<PokemonCard[]> 
 };
 
 export const getInitialCards = async (count: number): Promise<PokemonCard[]> => {
-    await initializeCardData();
-    if (allCards.length === 0) return [];
+    const defaultSetId = swordAndShieldEraSets[0].id;
+    const setData = await initializeCardData(defaultSetId);
+    if (!setData || setData.allCards.length === 0) return [];
     
     const initialCards: PokemonCard[] = [];
     for (let i = 0; i < count; i++) {
-        const randomIndex = Math.floor(Math.random() * allCards.length);
-        initialCards.push(allCards[randomIndex]);
+        const randomIndex = Math.floor(Math.random() * setData.allCards.length);
+        initialCards.push(setData.allCards[randomIndex]);
     }
     return initialCards;
 }
