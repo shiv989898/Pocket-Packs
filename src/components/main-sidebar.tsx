@@ -45,12 +45,12 @@ export function MainSidebar() {
           <SidebarMenu>
             {menuItems.map(item => (
               <SidebarMenuItem key={item.href}>
-                <Link href={item.href} legacyBehavior passHref>
-                  <SidebarMenuButton isActive={pathname === item.href} tooltip={item.label}>
+                <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
+                  <Link href={item.href}>
                     <item.icon />
                     <span>{item.label}</span>
-                  </SidebarMenuButton>
-                </Link>
+                  </Link>
+                </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
@@ -77,13 +77,11 @@ export function MainSidebar() {
               <span className="font-semibold text-foreground">User</span>
               <span className="text-xs text-muted-foreground">user@email.com</span>
             </div>
-            <Link href="/" legacyBehavior passHref>
-              <Button asChild variant="ghost" size="icon" className="ml-auto group-data-[collapsible=icon]:ml-0">
-                <a>
-                  <LogOut />
-                </a>
-              </Button>
-            </Link>
+            <Button asChild variant="ghost" size="icon" className="ml-auto group-data-[collapsible=icon]:ml-0">
+              <Link href="/">
+                <LogOut />
+              </Link>
+            </Button>
           </div>
         </SidebarFooter>
       </Sidebar>
