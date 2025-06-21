@@ -53,9 +53,9 @@ async function initializeCardData() {
   if (allCards.length > 0) return;
 
   try {
-    const response = await fetch(`https://api.tcgdex.net/v2/en/sets/${currentSet.id}`);
+    const response = await fetch(`/api/cards/${currentSet.id}`);
     if (!response.ok) {
-        throw new Error(`Failed to fetch cards: ${response.statusText}`);
+        throw new Error(`Failed to fetch cards: ${response.status} ${response.statusText}`);
     }
     const data = await response.json();
     
@@ -115,20 +115,24 @@ export const getBoosterPack = async (size: number = 10): Promise<PokemonCard[]> 
   
   // 6 Commons
   for (let i = 0; i < 6; i++) {
-    pack.push(getRandomCard('Common')!);
+    const card = getRandomCard('Common');
+    if (card) pack.push(card);
   }
 
   // 3 Uncommons
   for (let i = 0; i < 3; i++) {
-    pack.push(getRandomCard('Uncommon')!);
+    const card = getRandomCard('Uncommon');
+    if (card) pack.push(card);
   }
 
   // 1 Rare or Ultra Rare
   const rareRoll = Math.random();
   if (rareRoll < 0.2) { 
-    pack.push(getRandomCard('Ultra Rare')!);
+    const card = getRandomCard('Ultra Rare');
+    if (card) pack.push(card);
   } else {
-    pack.push(getRandomCard('Rare')!);
+    const card = getRandomCard('Rare');
+    if (card) pack.push(card);
   }
   
   return pack.filter(Boolean).slice(0, size);
