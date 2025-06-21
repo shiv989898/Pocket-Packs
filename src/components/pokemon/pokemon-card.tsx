@@ -5,7 +5,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Circle, Diamond, Star, Sparkles } from 'lucide-react';
+import { 
+  Circle, Diamond, Star, Sparkles,
+  Flame, Droplets, Leaf, Zap, BrainCircuit, Mountain, Wind, Skull, Moon, Shield, Sparkle as SparkleIcon
+} from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 
@@ -22,17 +25,17 @@ const rarityColors = {
 };
 
 const typeColors: { [key in PokemonCard['type']]: string } = {
-    Fire: 'bg-red-500',
-    Water: 'bg-blue-500',
-    Grass: 'bg-green-500',
-    Electric: 'bg-yellow-400 text-black',
-    Psychic: 'bg-purple-500',
-    Fighting: 'bg-orange-700',
-    Colorless: 'bg-gray-400',
-    Dragon: 'bg-indigo-600',
-    Darkness: 'bg-gray-800',
-    Metal: 'bg-zinc-500',
-    Fairy: 'bg-pink-400',
+    Fire: 'text-red-500',
+    Water: 'text-blue-500',
+    Grass: 'text-green-500',
+    Electric: 'text-yellow-400',
+    Psychic: 'text-purple-500',
+    Fighting: 'text-orange-700',
+    Colorless: 'text-gray-400',
+    Dragon: 'text-indigo-500',
+    Darkness: 'text-gray-300',
+    Metal: 'text-zinc-400',
+    Fairy: 'text-pink-400',
 };
 
 const RarityIcon = ({ rarity }: { rarity: Rarity }) => {
@@ -47,6 +50,24 @@ const RarityIcon = ({ rarity }: { rarity: Rarity }) => {
       return <Sparkles className="h-4 w-4 text-primary" fill="currentColor" />;
     default:
       return null;
+  }
+};
+
+const TypeIcon = ({ type }: { type: CardType }) => {
+  const props = { className: cn("h-5 w-5", typeColors[type]), "aria-label": type };
+  switch (type) {
+    case 'Fire': return <Flame {...props} />;
+    case 'Water': return <Droplets {...props} />;
+    case 'Grass': return <Leaf {...props} />;
+    case 'Electric': return <Zap {...props} />;
+    case 'Psychic': return <BrainCircuit {...props} />;
+    case 'Fighting': return <Mountain {...props} />;
+    case 'Colorless': return <Wind {...props} />;
+    case 'Dragon': return <Skull {...props} />;
+    case 'Darkness': return <Moon {...props} />;
+    case 'Metal': return <Shield {...props} />;
+    case 'Fairy': return <SparkleIcon {...props} />;
+    default: return null;
   }
 };
 
@@ -66,7 +87,16 @@ export function PokemonCardComponent({ card, quantity }: PokemonCardProps) {
         <div className="p-2 bg-card/80 backdrop-blur-sm">
             <h3 className="font-bold truncate text-sm">{card.name}</h3>
             <div className="flex items-center justify-between text-xs mt-1">
-                <Badge className={cn("text-white", typeColors[card.type])}>{card.type}</Badge>
+                <TooltipProvider delayDuration={100}>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <TypeIcon type={card.type} />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{card.type}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
                 <TooltipProvider delayDuration={100}>
                   <Tooltip>
                     <TooltipTrigger>
