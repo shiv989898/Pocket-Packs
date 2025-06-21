@@ -2,7 +2,7 @@
 
 import type { PokemonCard } from '@/lib/pokemon-data';
 import { MOCK_CARDS, getBoosterPack } from '@/lib/pokemon-data';
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Collection = {
   [key: string]: {
@@ -25,22 +25,30 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-const initialCollection: Collection = MOCK_CARDS.slice(0, 8).reduce((acc, card) => {
-  acc[card.id] = { card, quantity: Math.floor(Math.random() * 3) + 1 };
-  return acc;
-}, {} as Collection);
-
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const [collection, setCollection] = useState<Collection>(initialCollection);
+  const [collection, setCollection] = useState<Collection>({});
   const [currency, setCurrency] = useState(500);
   const [packs, setPacks] = useState(3);
-  const [lastClaimed, setLastClaimed] = useState<number | null>(() => {
-    if (typeof window !== 'undefined') {
-      const savedDate = localStorage.getItem('lastClaimed');
-      return savedDate ? parseInt(savedDate, 10) : null;
+  const [lastClaimed, setLastClaimed] = useState<number | null>(null);
+
+  useEffect(() => {
+    // This effect runs only on the client, after the initial render (hydration).
+    // This is the correct place for client-only logic like Math.random or accessing localStorage.
+    
+    // Set initial collection with random quantities.
+    const initialCollection: Collection = MOCK_CARDS.slice(0, 8).reduce((acc, card) => {
+      acc[card.id] = { card, quantity: Math.floor(Math.random() * 3) + 1 };
+      return acc;
+    }, {} as Collection);
+    setCollection(initialCollection);
+
+    // Get last claimed date from localStorage.
+    const savedDate = localStorage.getItem('lastClaimed');
+    if (savedDate) {
+      setLastClaimed(parseInt(savedDate, 10));
     }
-    return null;
-  });
+  }, []); // The empty dependency array ensures this runs only once on mount.
+
 
   const addCardsToCollection = (newCards: PokemonCard[]) => {
     setCollection(prev => {
