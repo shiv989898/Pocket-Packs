@@ -15,7 +15,7 @@ const packsForSale = [
     cost: 100,
     amount: 1,
     imageUrl: 'https://placehold.co/400x420.png',
-    aiHint: 'pokemon booster pack'
+    aiHint: 'scarlet violet booster'
   },
   {
     id: 'sv_collectors_bundle',
