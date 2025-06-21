@@ -11,20 +11,21 @@ export async function GET(
   }
 
   try {
-    const apiUrl = `https://api.tcgdex.net/v2/en/sets/${setId}`;
+    const apiUrl = `https://api.pokemontcg.io/v2/cards?q=set.id:${setId}`;
     const response = await fetch(apiUrl, { next: { revalidate: 3600 } }); // cache for 1 hour
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error(`TCGdex API error: ${response.status}`, errorData);
+      console.error(`pokemontcg.io API error: ${response.status}`, errorData);
       return NextResponse.json(
-        { error: `Failed to fetch from TCGdex API: ${response.statusText}` },
+        { error: `Failed to fetch from pokemontcg.io API: ${response.statusText}` },
         { status: response.status }
       );
     }
 
     const data = await response.json();
-    return NextResponse.json(data);
+    // The pokemontcg.io API wraps the card list in a 'data' property
+    return NextResponse.json(data.data);
   } catch (error) {
     console.error('Proxy API route error:', error);
     return NextResponse.json(

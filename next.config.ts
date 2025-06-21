@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'assets.tcgdex.net',
+        hostname: 'images.pokemontcg.io',
         port: '',
         pathname: '/**',
       },

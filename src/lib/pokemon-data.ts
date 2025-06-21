@@ -9,15 +9,18 @@ export interface PokemonCard {
   imageUrl: string;
 }
 
+// Switched to a new set from pokemontcg.io API
 const CURRENT_SET_ID = 'swsh1';
 const CURRENT_SET_NAME = 'Sword & Shield';
 
 export const currentSet = {
   id: CURRENT_SET_ID,
   name: CURRENT_SET_NAME,
-  packImageUrl: `https://assets.tcgdex.net/en/swsh/swsh1/logo.png`,
+  // Using the logo from pokemontcg.io for the pack image
+  packImageUrl: `https://images.pokemontcg.io/swsh1/logo.png`,
 };
 
+// Updated rarity mapping for pokemontcg.io API
 const rarityMapping: { [key: string]: Rarity | undefined } = {
   'Common': 'Common',
   'Uncommon': 'Uncommon',
@@ -35,8 +38,10 @@ const rarityMapping: { [key: string]: Rarity | undefined } = {
   'Amazing Rare': 'Ultra Rare',
   'Rare Secret': 'Ultra Rare',
   'Shiny Rare': 'Ultra Rare',
+  'Rare Rainbow': 'Ultra Rare',
 };
 
+// Type mapping for pokemontcg.io (Lightning -> Electric)
 const typeMapping: { [key in string]: CardType | undefined } = {
     'Fire': 'Fire',
     'Water': 'Water',
@@ -63,16 +68,19 @@ async function initializeCardData() {
     if (!response.ok) {
         const errorBody = await response.text();
         console.error("Error fetching card data via proxy:", response.status, errorBody);
-        throw new Error(`Failed to fetch cards: ${response.status}`);
+        throw new Error(`Failed to fetch cards: ${response.status} ${errorBody}`);
     }
     const data = await response.json();
     
-    const processedCards: PokemonCard[] = data.cards
+    // pokemontcg.io API returns an array directly from our proxy
+    const processedCards: PokemonCard[] = data
       .map((apiCard: any): PokemonCard | null => {
         const rarity = apiCard.rarity ? rarityMapping[apiCard.rarity] : undefined;
+        // The API provides `supertype` which should be 'Pokémon'
+        const isPokemon = apiCard.supertype === 'Pokémon';
         const type = (apiCard.types && apiCard.types.length > 0) ? typeMapping[apiCard.types[0]] : undefined;
 
-        if (!rarity || !type || !apiCard.image || apiCard.category !== 'Pokémon') {
+        if (!rarity || !type || !apiCard.images?.large || !isPokemon) {
           return null;
         }
 
@@ -81,7 +89,7 @@ async function initializeCardData() {
           name: apiCard.name,
           type: type,
           rarity: rarity,
-          imageUrl: `${apiCard.image}/high.webp`,
+          imageUrl: apiCard.images.large,
         };
       })
       .filter((card: PokemonCard | null): card is PokemonCard => card !== null);
