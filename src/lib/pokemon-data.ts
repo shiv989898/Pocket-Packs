@@ -9,13 +9,13 @@ export interface PokemonCard {
   imageUrl: string;
 }
 
-const CURRENT_SET_ID = 'sv1';
-const CURRENT_SET_NAME = 'Scarlet & Violet';
+const CURRENT_SET_ID = 'sv2';
+const CURRENT_SET_NAME = 'Paldea Evolved';
 
 export const currentSet = {
   id: CURRENT_SET_ID,
   name: CURRENT_SET_NAME,
-  packImageUrl: `https://assets.tcgdex.net/en/sv/sv1/logo.png`,
+  packImageUrl: `https://assets.tcgdex.net/en/sv/sv2/logo.png`,
 };
 
 const rarityMapping: { [key: string]: Rarity | undefined } = {
