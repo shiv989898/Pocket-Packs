@@ -53,33 +53,52 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
+        setLoading(true);
         const userDocRef = doc(db, 'users', firebaseUser.uid);
-        const userDocSnap = await getDoc(userDocRef);
+        try {
+          const userDocSnap = await getDoc(userDocRef);
 
-        if (userDocSnap.exists()) {
-          setUserData(userDocSnap.data() as UserData);
-        } else {
-          const initialCards = await getInitialCards(8);
-          const initialCollection: Collection = initialCards.reduce((acc, card) => {
-            if(card) {
-              acc[card.id] = { card, quantity: 1 };
+          if (userDocSnap.exists()) {
+            setUserData(userDocSnap.data() as UserData);
+          } else {
+            console.log(`Creating new user profile for ${firebaseUser.uid}...`);
+            let initialCollection: Collection = {};
+            try {
+              const initialCards = await getInitialCards(8);
+              initialCollection = initialCards.reduce((acc, card) => {
+                if (card) {
+                  acc[card.id] = { card, quantity: 1 };
+                }
+                return acc;
+              }, {} as Collection);
+               if (initialCards.length === 0) {
+                  console.warn("New user received an empty starter deck. The card fetching API might be down.");
+              }
+            } catch (error) {
+              console.error("Failed to fetch initial cards for new user:", error);
             }
-            return acc;
-          }, {} as Collection);
 
-          const newUserData: UserData = {
-            username: firebaseUser.displayName || 'New User',
-            collection: initialCollection,
-            currency: 500,
-            packs: 3,
-            lastClaimed: null,
-          };
-          await setDoc(userDocRef, newUserData);
-          setUserData(newUserData);
-        }
-        setUser(firebaseUser);
-        if (pathname === '/' || pathname === '/signup') {
-          router.push('/dashboard');
+            const newUserData: UserData = {
+              username: firebaseUser.displayName || 'New User',
+              collection: initialCollection,
+              currency: 500,
+              packs: 3,
+              lastClaimed: null,
+            };
+            await setDoc(userDocRef, newUserData);
+            setUserData(newUserData);
+            console.log("New user profile created successfully.");
+          }
+          setUser(firebaseUser);
+          if (pathname === '/' || pathname === '/signup') {
+            router.push('/dashboard');
+          }
+        } catch (error) {
+            console.error("Error managing user data:", error);
+            setUser(null);
+            setUserData(null);
+        } finally {
+            setLoading(false);
         }
       } else {
         setUser(null);
@@ -87,8 +106,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         if (pathname.startsWith('/dashboard')) {
             router.push('/');
         }
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
