@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Sidebar,
   SidebarHeader,
@@ -20,6 +20,9 @@ import { LayoutDashboard, PackageOpen, Layers3, Store, LogOut, Wallet, Gem } fro
 import { Separator } from './ui/separator';
 import { useEffect, useState } from 'react';
 import { Skeleton } from './ui/skeleton';
+import { auth } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
+import { useToast } from '@/hooks/use-toast';
 
 const menuItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -30,12 +33,31 @@ const menuItems = [
 
 export function MainSidebar() {
   const pathname = usePathname();
-  const { currency, packs } = useUser();
+  const router = useRouter();
+  const { toast } = useToast();
+  const { user, loading, currency, packs, username } = useUser();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+        await signOut(auth);
+        toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
+        router.push('/');
+    } catch (error) {
+        toast({ title: 'Logout Failed', description: 'There was an error logging out.', variant: 'destructive' });
+    }
+  };
+
+  const renderStat = (value: string | number) => {
+    if (!isClient || loading) {
+        return <Skeleton className="h-5 w-full" />;
+    }
+    return value;
+  };
 
   return (
     <Sidebar className="border-r" collapsible="icon">
@@ -65,30 +87,30 @@ export function MainSidebar() {
           <div className="flex items-center gap-2">
               <Wallet className="h-5 w-5 text-accent" />
               <div className="font-semibold group-data-[collapsible=icon]:hidden w-16">
-                {isClient ? currency.toLocaleString() : <Skeleton className="h-5 w-full" />}
+                {renderStat(currency.toLocaleString())}
               </div>
           </div>
           <div className="flex items-center gap-2">
               <Gem className="h-5 w-5 text-accent" />
               <div className="font-semibold group-data-[collapsible=icon]:hidden w-16">
-                 {isClient ? `${packs} Packs` : <Skeleton className="h-5 w-full" />}
+                 {renderStat(`${packs} Packs`)}
               </div>
           </div>
         </div>
         <Separator className="my-2" />
         <div className="flex items-center gap-3 p-2 group-data-[collapsible=icon]:justify-center">
           <Avatar className="h-10 w-10">
-            <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="person avatar" />
-            <AvatarFallback>U</AvatarFallback>
+            <AvatarImage src={user?.photoURL ?? "https://placehold.co/100x100.png"} alt={username} data-ai-hint="person avatar" />
+            <AvatarFallback>{username ? username.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-            <span className="font-semibold text-foreground">User</span>
-            <span className="text-xs text-muted-foreground">user@email.com</span>
+            <span className="font-semibold text-foreground">{loading ? <Skeleton className="h-5 w-20" /> : username}</span>
+            <span className="text-xs text-muted-foreground">{loading ? <Skeleton className="h-4 w-28 mt-1" /> : user?.email}</span>
           </div>
-          <Button asChild variant="ghost" size="icon" className="ml-auto group-data-[collapsible=icon]:ml-0">
-            <Link href="/">
+          <Button asChild variant="ghost" size="icon" className="ml-auto group-data-[collapsible=icon]:ml-0" onClick={handleLogout}>
+            <div>
               <LogOut />
-            </Link>
+            </div>
           </Button>
         </div>
       </SidebarFooter>
