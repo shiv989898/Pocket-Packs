@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -7,9 +8,10 @@ import { swordAndShieldEraSets } from '@/lib/pokemon-data';
 import { Button } from '@/components/ui/button';
 import { PokemonCardComponent } from './pokemon-card';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Gem, Layers, RefreshCw } from 'lucide-react';
+import { Gem, Layers, RefreshCw, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 const CardBack = () => (
     <div className="w-full h-full rounded-xl overflow-hidden border-4 border-primary/50 bg-secondary flex items-center justify-center cursor-pointer shadow-lg hover:shadow-primary/50 transition-shadow">
@@ -19,11 +21,10 @@ const CardBack = () => (
 
 const FlippableCard = ({ card, isFlipped, onFlip }: { card: PokemonCard; isFlipped: boolean; onFlip: () => void; }) => {
   return (
-    <motion.div
-      className="w-full h-full"
+    <div
+      className="w-full h-full cursor-pointer"
       style={{ perspective: 1000 }}
-      whileHover={{ scale: 1.05, z: 10 }}
-      transition={{ duration: 0.2 }}
+      onClick={onFlip}
     >
       <motion.div
         className="relative w-full h-full"
@@ -31,27 +32,17 @@ const FlippableCard = ({ card, isFlipped, onFlip }: { card: PokemonCard; isFlipp
         initial={false}
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ duration: 0.6, ease: 'easeInOut' }}
-        onClick={onFlip}
       >
+        {/* Card Front (visible after flip) */}
         <div className="absolute w-full h-full" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
-            <AnimatePresence>
-              {isFlipped && (
-                  <motion.div
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.2, duration: 0.3 }}
-                      className="w-full h-full"
-                  >
-                      <PokemonCardComponent card={card} />
-                  </motion.div>
-              )}
-            </AnimatePresence>
+          <PokemonCardComponent card={card} />
         </div>
+        {/* Card Back (visible initially) */}
         <div className="absolute w-full h-full" style={{ backfaceVisibility: 'hidden' }}>
           <CardBack />
         </div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -60,7 +51,9 @@ export function PackOpener() {
   const { packs, openPack } = useUser();
   const [packState, setPackState] = useState<'idle' | 'opening' | 'revealing' | 'finished'>('idle');
   const [packContents, setPackContents] = useState<PokemonCard[]>([]);
-  const [flipped, setFlipped] = useState<boolean[]>(Array(5).fill(false));
+  const [revealedCount, setRevealedCount] = useState(0);
+  const [isFlipped, setIsFlipped] = useState(false);
+
   const [isClient, setIsClient] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [selectedSetId, setSelectedSetId] = useState<string>(swordAndShieldEraSets[0].id);
@@ -77,6 +70,7 @@ export function PackOpener() {
       setTimeout(() => {
         if (newCards && newCards.length > 0) {
           const rarityOrder: Record<PokemonCard['rarity'], number> = { 'Common': 1, 'Uncommon': 2, 'Rare': 3, 'Ultra Rare': 4 };
+          // Sort so commons are first, then uncommons, with the rare/ultra rare last.
           const sortedCards = newCards.sort((a, b) => rarityOrder[a.rarity] - rarityOrder[b.rarity]);
           setPackContents(sortedCards);
           setPackState('revealing');
@@ -88,21 +82,25 @@ export function PackOpener() {
     }
   };
 
-  const handleFlip = (index: number) => {
-    if (packState !== 'revealing' || flipped[index]) return;
-    const newFlipped = [...flipped];
-    newFlipped[index] = true;
-    setFlipped(newFlipped);
+  const handleFlip = () => {
+    if (packState !== 'revealing' || isFlipped) return;
+    setIsFlipped(true);
+  };
 
-    if (newFlipped.every(f => f)) {
-        setTimeout(() => setPackState('finished'), 1000);
+  const handleNextCard = () => {
+    if (revealedCount < packContents.length - 1) {
+        setRevealedCount(prev => prev + 1);
+        setIsFlipped(false);
+    } else {
+        setPackState('finished');
     }
   };
 
   const handleReset = () => {
     setPackState('idle');
     setPackContents([]);
-    setFlipped(Array(5).fill(false));
+    setRevealedCount(0);
+    setIsFlipped(false);
   };
   
   const selectedSet = swordAndShieldEraSets.find(s => s.id === selectedSetId) || swordAndShieldEraSets[0];
@@ -121,20 +119,7 @@ export function PackOpener() {
     },
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const cardVariants = {
-    hidden: { y: 20, opacity: 0, scale: 0.9 },
-    visible: { y: 0, opacity: 1, scale: 1 },
-  };
+  const cardToShow = packContents[revealedCount];
 
   return (
     <div className="w-full flex flex-col items-center justify-center p-4">
@@ -164,7 +149,7 @@ export function PackOpener() {
         )}
       </AnimatePresence>
 
-      <div className="relative w-full flex-grow min-h-[50vh] flex items-center justify-center">
+      <div className="relative w-full flex-grow min-h-[60vh] flex flex-col items-center justify-center">
         <AnimatePresence mode="wait">
           {packState === 'idle' && (
             <motion.div
@@ -209,23 +194,57 @@ export function PackOpener() {
             </motion.div>
           )}
 
-          {packState === 'revealing' && packContents.length > 0 && (
+          {packState === 'revealing' && cardToShow && (
             <motion.div
-              key="card-grid"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6 w-full max-w-5xl"
+              key="card-reveal-area"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col items-center justify-center"
             >
-              {packContents.map((card, index) => (
-                <motion.div key={card.id + index} variants={cardVariants} className="aspect-[3/4]">
-                  <FlippableCard
-                    card={card}
-                    isFlipped={flipped[index]}
-                    onFlip={() => handleFlip(index)}
-                  />
-                </motion.div>
-              ))}
+              <p className={cn(
+                  "text-lg font-semibold text-muted-foreground mb-4 transition-colors duration-300",
+                  isFlipped && cardToShow.rarity === 'Ultra Rare' && 'text-primary',
+                  isFlipped && cardToShow.rarity === 'Rare' && 'text-accent'
+              )}>
+                  {revealedCount + 1} / {packContents.length}
+              </p>
+
+              <div className="w-[240px] h-[335px] sm:w-[260px] sm:h-[363px]">
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={revealedCount}
+                        initial={{ opacity: 0, x: 50, scale: 0.9 }}
+                        animate={{ opacity: 1, x: 0, scale: 1 }}
+                        exit={{ opacity: 0, x: -50, scale: 0.9 }}
+                        transition={{ duration: 0.3 }}
+                        className="w-full h-full"
+                    >
+                        <FlippableCard
+                            card={cardToShow}
+                            isFlipped={isFlipped}
+                            onFlip={handleFlip}
+                        />
+                    </motion.div>
+                </AnimatePresence>
+              </div>
+
+              <div className="mt-6 h-11">
+                <AnimatePresence>
+                    {isFlipped && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                        >
+                            <Button onClick={handleNextCard} size="lg">
+                                {revealedCount < packContents.length - 1 ? (
+                                    <>Next Card <ArrowRight className="ml-2" /></>
+                                ) : 'Finish'}
+                            </Button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+              </div>
             </motion.div>
           )}
 
