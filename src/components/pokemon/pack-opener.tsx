@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 
 const CardBack = () => (
     <div className="w-full h-full rounded-xl overflow-hidden border-4 border-primary/50 bg-secondary flex items-center justify-center cursor-pointer shadow-lg hover:shadow-primary/50 transition-shadow">
-        <Image src="https://placehold.co/245x342.png" data-ai-hint="pokemon card back" alt="Card Back" width={245} height={342} className="object-cover" />
+        <Image src="https://upload.wikimedia.org/wikipedia/en/3/3b/Pokemon_Trading_Card_Game_cardback.jpg" data-ai-hint="pokemon card back" alt="Card Back" width={245} height={342} className="object-cover" />
     </div>
 );
 
