@@ -21,7 +21,7 @@ const rarityColors = {
   'Common': 'border-muted/30',
   'Uncommon': 'border-secondary',
   'Rare': 'border-accent/70',
-  'Ultra Rare': 'border-primary shadow-lg shadow-primary/40 hover:shadow-primary/60 transition-shadow',
+  'Ultra Rare': 'border-primary shadow-lg shadow-primary/40',
 };
 
 const typeColors: { [key in PokemonCard['type']]: string } = {
@@ -74,8 +74,8 @@ const TypeIcon = ({ type }: { type: CardType }) => {
 
 export function PokemonCardComponent({ card, quantity }: PokemonCardProps) {
   return (
-    <Card className={cn("overflow-hidden relative group transition-all duration-300 hover:scale-105 hover:z-10", rarityColors[card.rarity], 'border-4')}>
-      <CardContent className="p-0">
+    <Card className={cn("overflow-hidden relative group", rarityColors[card.rarity], 'border-4 h-full')}>
+      <CardContent className="p-0 h-full flex flex-col">
         <div className="aspect-[3/4] relative">
           <Image src={card.imageUrl} alt={card.name} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover"/>
           {quantity && quantity > 1 && (
@@ -84,7 +84,7 @@ export function PokemonCardComponent({ card, quantity }: PokemonCardProps) {
             </Badge>
           )}
         </div>
-        <div className="p-2 bg-card/80 backdrop-blur-sm">
+        <div className="p-2 bg-card/80 backdrop-blur-sm mt-auto">
             <h3 className="font-bold truncate text-sm">{card.name}</h3>
             <div className="flex items-center justify-between text-xs mt-1">
                 <TooltipProvider delayDuration={100}>
