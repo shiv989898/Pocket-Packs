@@ -10,7 +10,6 @@ import { auth, googleProvider } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
 import { UserPlus } from 'lucide-react';
 
 const formSchema = z.object({
@@ -25,7 +24,6 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export function SignUpForm() {
   const router = useRouter();
-  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,11 +35,7 @@ export function SignUpForm() {
   });
 
   const showFirebaseNotConfiguredToast = () => {
-    toast({
-        title: 'Firebase Not Configured',
-        description: "Please provide Firebase credentials in a '.env.local' file.",
-        variant: 'destructive',
-    });
+    console.warn("Firebase Not Configured. Please provide Firebase credentials in a '.env.local' file.");
   }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -56,18 +50,9 @@ export function SignUpForm() {
                 displayName: values.username,
             });
         }
-        toast({
-            title: 'Account Created!',
-            description: "Welcome to Pocket Packs! Let's start your collection.",
-        });
         router.push('/dashboard');
     } catch (error: any) {
         console.error("Signup Error:", error);
-        toast({
-            title: 'Sign Up Failed',
-            description: error.message || 'An unexpected error occurred.',
-            variant: 'destructive',
-        });
     }
   }
 
@@ -78,18 +63,9 @@ export function SignUpForm() {
     }
     try {
       await signInWithPopup(auth, googleProvider);
-      toast({
-        title: 'Account Created!',
-        description: "Welcome to Pocket Packs! Let's start your collection.",
-      });
       router.push('/dashboard');
     } catch (error: any) {
        console.error("Google Sign-In Error:", error);
-      toast({
-        title: 'Google Sign-In Failed',
-        description: error.message || 'Could not sign in with Google.',
-        variant: 'destructive'
-      });
     }
   };
 

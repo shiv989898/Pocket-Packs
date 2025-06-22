@@ -5,7 +5,6 @@ import { useUser } from '@/contexts/user-provider';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Gift, PackageOpen, Layers3, Wallet, Gem, Clock, Star, Store } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState, useMemo } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { PokemonCard, Rarity } from '@/lib/pokemon-data';
@@ -15,7 +14,6 @@ const rarityOrder: Rarity[] = ['Ultra Rare', 'Rare', 'Uncommon', 'Common'];
 
 export default function DashboardPage() {
   const { collection, currency, packs, claimDailyReward, lastClaimed } = useUser();
-  const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
   const [canClaim, setCanClaim] = useState(false);
 
@@ -49,17 +47,6 @@ export default function DashboardPage() {
   const handleClaimReward = () => {
     if (canClaim) {
       claimDailyReward();
-      toast({
-        title: 'Daily Reward Claimed!',
-        description: 'You received 100 currency.',
-        action: <Gift className="h-5 w-5 text-primary" />,
-      });
-    } else {
-      toast({
-        title: 'Already Claimed',
-        description: 'You can claim your next daily reward tomorrow.',
-        variant: 'destructive',
-      });
     }
   };
   

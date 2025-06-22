@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@/contexts/user-provider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
 import { Gem, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import { swordAndShieldEraSets } from '@/lib/pokemon-data';
@@ -60,7 +59,6 @@ const SafeImage = ({ pack }: { pack: typeof packsForSale[0] }) => {
 
 export default function StorePage() {
   const { currency, setCurrency, addPacks } = useUser();
-  const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -71,16 +69,8 @@ export default function StorePage() {
     if (currency >= cost) {
       setCurrency(currency - cost);
       addPacks(amount);
-      toast({
-        title: 'Purchase Successful!',
-        description: `You bought ${name} and received ${amount} pack(s).`,
-      });
     } else {
-      toast({
-        title: 'Insufficient Funds',
-        description: "You don't have enough currency for this item.",
-        variant: 'destructive',
-      });
+      console.warn("Insufficient funds for purchase.");
     }
   };
 

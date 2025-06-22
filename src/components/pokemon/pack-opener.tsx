@@ -6,7 +6,6 @@ import type { PokemonCard } from '@/lib/pokemon-data';
 import { swordAndShieldEraSets } from '@/lib/pokemon-data';
 import { Button } from '@/components/ui/button';
 import { PokemonCardComponent } from './pokemon-card';
-import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Gem, Package, Sparkles, ChevronRight, Check } from 'lucide-react';
 import Image from 'next/image';
@@ -21,7 +20,6 @@ const CardBack = () => (
 
 export function PackOpener() {
   const { packs, openPack } = useUser();
-  const { toast } = useToast();
   const [isOpening, setIsOpening] = useState(false);
   const [isRevealing, setIsRevealing] = useState(false);
   const [packContents, setPackContents] = useState<PokemonCard[]>([]);
@@ -49,24 +47,10 @@ export function PackOpener() {
           setPackContents(newCards);
           setRevealedIndex(0); // Directly show the first card
           setIsRevealing(true);
-          toast({
-            title: "Pack Ready!",
-            description: `You've got ${newCards.length} new cards!`,
-          });
         } else {
-           toast({
-            title: "Error opening pack",
-            description: "Could not retrieve cards for the selected set. Your pack has not been used.",
-            variant: "destructive",
-          });
+           console.error("Error opening pack: Could not retrieve cards for the selected set. Your pack has not been used.");
         }
       }, 2000); // Shorter animation time
-    } else if (packs <= 0) {
-      toast({
-        title: "No packs left!",
-        description: "Visit the store to get more packs.",
-        variant: "destructive",
-      });
     }
   };
   

@@ -22,7 +22,6 @@ import { useEffect, useState } from 'react';
 import { Skeleton } from './ui/skeleton';
 import { auth } from '@/lib/firebase';
 import { signOut } from 'firebase/auth';
-import { useToast } from '@/hooks/use-toast';
 
 const menuItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -34,7 +33,6 @@ const menuItems = [
 export function MainSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { toast } = useToast();
   const { user, loading, currency, packs, username } = useUser();
   const [isClient, setIsClient] = useState(false);
 
@@ -44,15 +42,14 @@ export function MainSidebar() {
 
   const handleLogout = async () => {
     if (!auth) {
-        toast({ title: 'Firebase Not Configured', description: 'Cannot log out.', variant: 'destructive' });
+        console.warn('Firebase Not Configured: Cannot log out.');
         return;
     }
     try {
         await signOut(auth);
-        toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
         router.push('/');
     } catch (error) {
-        toast({ title: 'Logout Failed', description: 'There was an error logging out.', variant: 'destructive' });
+        console.error('Logout Failed', error);
     }
   };
 
