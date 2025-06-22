@@ -1,6 +1,7 @@
+
 'use client';
 
-import type { PokemonCard, Rarity } from '@/lib/pokemon-data';
+import type { PokemonCard, Rarity, CardType } from '@/lib/pokemon-data';
 import { Card, CardContent } from '@/components/ui/card';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
@@ -84,9 +85,9 @@ export function PokemonCardComponent({ card, quantity }: PokemonCardProps) {
             </Badge>
           )}
         </div>
-        <div className="p-2 bg-card/80 backdrop-blur-sm mt-auto">
-            <h3 className="font-bold truncate text-sm">{card.name}</h3>
-            <div className="flex items-center justify-between text-xs mt-1">
+        <div className="p-2 bg-card/80 backdrop-blur-sm mt-auto space-y-1">
+            <h3 className="font-bold truncate text-sm leading-tight">{card.name}</h3>
+            <div className="flex items-center justify-between text-xs">
                 <TooltipProvider delayDuration={100}>
                   <Tooltip>
                     <TooltipTrigger>

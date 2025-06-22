@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -16,7 +17,7 @@ import { AppLogo } from './app-logo';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import { useUser } from '@/contexts/user-provider';
-import { LayoutDashboard, PackageOpen, Layers3, Store, LogOut, Wallet, Gem } from 'lucide-react';
+import { LayoutDashboard, PackageOpen, Layers3, Store, LogOut, Wallet, Gem, BookMarked } from 'lucide-react';
 import { Separator } from './ui/separator';
 import { useEffect, useState } from 'react';
 import { Skeleton } from './ui/skeleton';
@@ -27,6 +28,7 @@ const menuItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/dashboard/open-packs', label: 'Open Packs', icon: PackageOpen },
   { href: '/dashboard/collection', label: 'Collection', icon: Layers3 },
+  { href: '/dashboard/binder', label: 'Binder', icon: BookMarked },
   { href: '/dashboard/store', label: 'Store', icon: Store },
 ];
 

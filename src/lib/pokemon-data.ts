@@ -1,3 +1,4 @@
+
 export type Rarity = 'Common' | 'Uncommon' | 'Rare' | 'Ultra Rare';
 export type CardType = 'Fire' | 'Water' | 'Grass' | 'Electric' | 'Psychic' | 'Fighting' | 'Colorless' | 'Dragon' | 'Darkness' | 'Metal' | 'Fairy';
 
@@ -102,9 +103,12 @@ async function initializeCardData(setId: string): Promise<CardData | null> {
       .map((apiCard: any): PokemonCard | null => {
         const rarity = apiCard.rarity ? rarityMapping[apiCard.rarity] : undefined;
         const isPokemon = apiCard.supertype === 'Pokémon';
-        const type = (apiCard.types && apiCard.types.length > 0) ? typeMapping[apiCard.types[0]] : undefined;
 
-        if (!rarity || !type || !apiCard.images?.large || !isPokemon) {
+        // Robust type handling: default to Colorless if type is missing or unmapped
+        const primaryApiType = (apiCard.types && apiCard.types.length > 0) ? apiCard.types[0] : 'Colorless';
+        const type = typeMapping[primaryApiType] || 'Colorless';
+
+        if (!rarity || !apiCard.images?.large || !isPokemon) {
           return null;
         }
 
