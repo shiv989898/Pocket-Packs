@@ -86,7 +86,7 @@ export function PokemonCardComponent({ card, quantity }: PokemonCardProps) {
           )}
         </div>
         <div className="p-2 bg-card/80 backdrop-blur-sm mt-auto space-y-1">
-            <h3 className="font-bold truncate text-sm leading-tight">{card.name}</h3>
+            <h3 className="font-bold truncate text-sm">{card.name}</h3>
             <div className="flex items-center justify-between text-xs">
                 <TooltipProvider delayDuration={100}>
                   <Tooltip>

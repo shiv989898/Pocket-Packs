@@ -13,11 +13,22 @@ import { Progress } from '@/components/ui/progress';
 
 const CardPlaceholder = () => (
   <Card className="border-muted/30 border-2 border-dashed h-full">
-    <CardContent className="p-0 h-full flex flex-col items-center justify-center bg-muted/20">
-      <HelpCircle className="h-16 w-16 text-muted-foreground/50" />
+    <CardContent className="p-0 h-full flex flex-col bg-muted/20">
+      <div className="aspect-[3/4] relative flex items-center justify-center">
+        <HelpCircle className="h-16 w-16 text-muted-foreground/50" />
+      </div>
+      {/* Invisible spacer to match the footer of the real card component */}
+      <div className="p-2 space-y-1 mt-auto invisible" aria-hidden="true">
+        <h3 className="font-bold truncate text-sm leading-tight">placeholder</h3>
+        <div className="flex items-center justify-between text-xs">
+          <span>&nbsp;</span>
+          <span>&nbsp;</span>
+        </div>
+      </div>
     </CardContent>
   </Card>
 );
+
 
 export default function BinderPage() {
   const { collection } = useUser();
