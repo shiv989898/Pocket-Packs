@@ -17,10 +17,13 @@ export default function DashboardPage() {
   const { collection, currency, packs, claimDailyReward, lastClaimed } = useUser();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
+  const [canClaim, setCanClaim] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    const today = new Date().setHours(0, 0, 0, 0);
+    setCanClaim(!lastClaimed || lastClaimed < today);
+  }, [lastClaimed]);
 
   const { totalCards, uniqueCards, featuredCard } = useMemo(() => {
     const allCards = Object.values(collection);
@@ -42,9 +45,6 @@ export default function DashboardPage() {
 
     return { totalCards: total, uniqueCards: unique, featuredCard: feature };
   }, [collection]);
-
-  const today = new Date().setHours(0, 0, 0, 0);
-  const canClaim = isClient && (!lastClaimed || lastClaimed < today);
 
   const handleClaimReward = () => {
     if (canClaim) {
@@ -124,7 +124,7 @@ export default function DashboardPage() {
                 <CardDescription>Log in daily for free currency!</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button onClick={handleClaimReward} disabled={!canClaim} className="w-full">
+                <Button onClick={handleClaimReward} disabled={!isClient || !canClaim} className="w-full">
                   {canClaim ? <><Gift className="mr-2 h-4 w-4" /> Claim 100 Currency</> : <><Clock className="mr-2 h-4 w-4" /> Claimed Today</>}
                 </Button>
               </CardContent>
