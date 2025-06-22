@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import type { PokemonCard } from '@/lib/pokemon-data';
 import { getInitialCards, getBoosterPack } from '@/lib/pokemon-data';
@@ -6,7 +6,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, getDoc, setDoc, updateDoc, increment, arrayUnion } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, increment } from 'firebase/firestore';
 
 export type Collection = {
   [key: string]: {
@@ -75,7 +75,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
                   console.warn("New user received an empty starter deck. The card fetching API might be down.");
               }
             } catch (error) {
-              console.error("Failed to fetch initial cards for new user:", error);
+              console.error("Failed to fetch initial cards for new user. Creating profile with empty collection.", error);
             }
 
             const newUserData: UserData = {
@@ -189,7 +189,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     currency: userData?.currency ?? 0,
     packs: userData?.packs ?? 0,
     lastClaimed: userData?.lastClaimed ?? null,
-    username: userData?.username ?? '',
+    username: userData?.username ?? user?.displayName ?? '',
     addCardsToCollection,
     setCurrency,
     addPacks,

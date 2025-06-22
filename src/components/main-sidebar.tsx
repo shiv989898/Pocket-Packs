@@ -56,12 +56,17 @@ export function MainSidebar() {
     }
   };
 
-  const renderStat = (value: string | number) => {
+  const renderStat = (value: string | number | undefined) => {
     if (!isClient || loading) {
         return <Skeleton className="h-5 w-full" />;
     }
-    return value;
+    return value?.toLocaleString() ?? '0';
   };
+  
+  const displayName = username || user?.displayName || 'User';
+  const displayEmail = user?.email || 'No email';
+  const displayAvatar = user?.photoURL ?? "https://placehold.co/100x100.png";
+  const displayFallback = displayName ? displayName.charAt(0).toUpperCase() : 'U';
 
   return (
     <Sidebar className="border-r" collapsible="icon">
@@ -91,25 +96,25 @@ export function MainSidebar() {
           <div className="flex items-center gap-2">
               <Wallet className="h-5 w-5 text-accent" />
               <div className="font-semibold group-data-[collapsible=icon]:hidden w-16">
-                {renderStat(currency.toLocaleString())}
+                {renderStat(currency)}
               </div>
           </div>
           <div className="flex items-center gap-2">
               <Gem className="h-5 w-5 text-accent" />
               <div className="font-semibold group-data-[collapsible=icon]:hidden w-16">
-                 {renderStat(`${packs} Packs`)}
+                 {renderStat(packs)} Packs
               </div>
           </div>
         </div>
         <Separator className="my-2" />
         <div className="flex items-center gap-3 p-2 group-data-[collapsible=icon]:justify-center">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={user?.photoURL ?? "https://placehold.co/100x100.png"} alt={username} data-ai-hint="person avatar" />
-            <AvatarFallback>{username ? username.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
+            <AvatarImage src={displayAvatar} alt={displayName} data-ai-hint="person avatar" />
+            <AvatarFallback>{displayFallback}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-            <span className="font-semibold text-foreground">{loading ? <Skeleton className="h-5 w-20" /> : username}</span>
-            <span className="text-xs text-muted-foreground">{loading ? <Skeleton className="h-4 w-28 mt-1" /> : user?.email}</span>
+            <span className="font-semibold text-foreground">{loading ? <Skeleton className="h-5 w-20" /> : displayName}</span>
+            <span className="text-xs text-muted-foreground">{loading ? <Skeleton className="h-4 w-28 mt-1" /> : displayEmail}</span>
           </div>
           <Button asChild variant="ghost" size="icon" className="ml-auto group-data-[collapsible=icon]:ml-0" onClick={handleLogout}>
             <div>

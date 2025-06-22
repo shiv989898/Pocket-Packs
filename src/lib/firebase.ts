@@ -28,7 +28,7 @@ let auth: Auth | null = null;
 let db: Firestore | null = null;
 let googleProvider: GoogleAuthProvider | null = null;
 
-if (firebaseConfig.apiKey) {
+if (firebaseConfig.apiKey && typeof window !== 'undefined') {
   try {
     app = getApps().length ? getApp() : initializeApp(firebaseConfig);
     auth = getAuth(app);
@@ -56,7 +56,7 @@ if (firebaseConfig.apiKey) {
     db = null;
     googleProvider = null;
   }
-} else {
+} else if (!firebaseConfig.apiKey) {
   console.warn(
     "Firebase API Key is missing. Firebase features will be disabled. Please create a .env.local file with your Firebase project's configuration."
   );
