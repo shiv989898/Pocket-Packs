@@ -43,6 +43,10 @@ export function MainSidebar() {
   }, []);
 
   const handleLogout = async () => {
+    if (!auth) {
+        toast({ title: 'Firebase Not Configured', description: 'Cannot log out.', variant: 'destructive' });
+        return;
+    }
     try {
         await signOut(auth);
         toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });

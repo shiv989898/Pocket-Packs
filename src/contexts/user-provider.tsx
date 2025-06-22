@@ -43,6 +43,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
+    if (!auth || !db) {
+      setLoading(false);
+      if (pathname.startsWith('/dashboard')) {
+        router.push('/');
+      }
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         const userDocRef = doc(db, 'users', firebaseUser.uid);
@@ -51,7 +59,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         if (userDocSnap.exists()) {
           setUserData(userDocSnap.data() as UserData);
         } else {
-          // Create new user profile
           const initialCards = await getInitialCards(8);
           const initialCollection: Collection = initialCards.reduce((acc, card) => {
             if(card) {
@@ -92,7 +99,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addCardsToCollection = async (newCards: PokemonCard[]) => {
-    if (!user || !userData) return;
+    if (!user || !userData || !db) return;
     
     const collectionUpdates: { [key: string]: any } = {};
     const newCollection = { ...userData.collection };
@@ -114,21 +121,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addPacks = async (amount: number) => {
-    if (!user) return;
+    if (!user || !db) return;
     const userDocRef = doc(db, 'users', user.uid);
     await updateDoc(userDocRef, { packs: increment(amount) });
     updateUserData({ packs: (userData?.packs ?? 0) + amount });
   };
 
   const setCurrency = async (amount: number) => {
-      if (!user) return;
+      if (!user || !db) return;
       const userDocRef = doc(db, 'users', user.uid);
       await updateDoc(userDocRef, { currency: amount });
       updateUserData({ currency: amount });
   };
 
   const openPack = async (setId: string) => {
-    if (!user || !userData || userData.packs <= 0) return null;
+    if (!user || !userData || userData.packs <= 0 || !db) return null;
     
     const newCards = await getBoosterPack(setId);
     if (newCards && newCards.length > 0) {
@@ -140,7 +147,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   };
 
   const claimDailyReward = async () => {
-    if (!user || !userData) return;
+    if (!user || !userData || !db) return;
     const today = new Date().setHours(0, 0, 0, 0);
     if (!userData.lastClaimed || userData.lastClaimed < today) {
       const now = Date.now();

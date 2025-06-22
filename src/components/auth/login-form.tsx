@@ -35,7 +35,19 @@ export function LoginForm() {
     },
   });
 
+  const showFirebaseNotConfiguredToast = () => {
+    toast({
+        title: 'Firebase Not Configured',
+        description: "Please provide Firebase credentials in a '.env.local' file.",
+        variant: 'destructive',
+    });
+  }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!auth) {
+      showFirebaseNotConfiguredToast();
+      return;
+    }
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
@@ -54,6 +66,10 @@ export function LoginForm() {
   }
 
   const handleGoogleSignIn = async () => {
+    if (!auth || !googleProvider) {
+      showFirebaseNotConfiguredToast();
+      return;
+    }
     try {
       await signInWithPopup(auth, googleProvider);
       toast({

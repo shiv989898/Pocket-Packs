@@ -10,9 +10,9 @@
 // NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID="your-sender-id"
 // NEXT_PUBLIC_FIREBASE_APP_ID="your-app-id"
 
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
+import { getAuth, GoogleAuthProvider, type Auth } from "firebase/auth";
+import { getFirestore, type Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -23,10 +23,28 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
-const db = getFirestore(app);
-const googleProvider = new GoogleAuthProvider();
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+let db: Firestore | null = null;
+let googleProvider: GoogleAuthProvider | null = null;
+
+if (firebaseConfig.apiKey) {
+  try {
+    app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    googleProvider = new GoogleAuthProvider();
+  } catch (error: any) {
+    console.error("Firebase initialization error:", error.message);
+    app = null;
+    auth = null;
+    db = null;
+    googleProvider = null;
+  }
+} else {
+  console.warn(
+    "Firebase API Key is missing. Firebase features will be disabled. Please create a .env.local file with your Firebase project's configuration."
+  );
+}
 
 export { app, auth, db, googleProvider };
